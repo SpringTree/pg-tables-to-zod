@@ -1,0 +1,19 @@
+{
+	"pg": {
+		"host": "localhost",
+		"database": "my_db",
+		"port": 5432,
+		"user": "postgres",
+		"password": "secret"
+	},
+	"input": {
+		"schemas": ["public", "stuff"],
+		"exclude": ["not_this_table"],
+		"include": []
+	},
+	"output": {
+		"strict": true,
+		"defaultDescription": "Missing description",
+		"outDir": "/src/validators/database"
+	}
+}
