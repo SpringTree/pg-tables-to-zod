@@ -1,4 +1,5 @@
 import { program } from 'commander';
+import { merge } from 'lodash-es';
 import prompts from 'prompts';
 import { z } from 'zod';
 import { version } from '../package.json';
@@ -52,7 +53,6 @@ const options = program.opts();
 
 if (Object.keys(options).length === 0) {
 	program.help();
-	process.exit(1);
 }
 
 const {
@@ -96,20 +96,7 @@ if (config) {
 		// Apply the configuration file values, overridden by CLI options
 		//
 		const configFromFile = await readConfigFile(config);
-		configuration = {
-			pg: {
-				...configFromFile.pg,
-				...configuration.pg,
-			},
-			input: {
-				...configFromFile.input,
-				...configuration.input,
-			},
-			output: {
-				...configFromFile.output,
-				...configuration.output,
-			},
-		};
+		configuration = merge(configuration, configFromFile, configuration);
 	} catch (error) {
 		console.error(`Failed to read configuration file at ${config}:`, error);
 		process.exit(1);

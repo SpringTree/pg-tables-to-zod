@@ -1,5 +1,11 @@
 import { type Column, EnumType } from 'pg-structure';
 
+function escapeSingleQuotes(
+	str: string | number | null | boolean | undefined,
+): string {
+	return (str?.toString() ?? '').replace(/'/g, "\\'");
+}
+
 /**
  * Helper method to convert a postgresql column to a Zod schema object property.
  * This will be used in the convertEntity method to build the full entity schema.
@@ -17,7 +23,7 @@ export function convertColumn({
 	const isArray = column.arrayDimension > 0;
 	const enumType =
 		column.type instanceof EnumType ? (column.type as EnumType) : undefined;
-	let description = `${column.comment || defaultDescription || `No description available for column ${columnName}`}. Database type: ${columnType}. Default value: ${column.default}`;
+	let description = `${escapeSingleQuotes(column.comment) || defaultDescription || `No description available for column ${columnName}`}. Database type: ${columnType}. Default value: ${escapeSingleQuotes(column.default)}`;
 	if (enumType) {
 		const values = enumType.values;
 		description += ` Enumeration values: ${values.join(', ')}`;
@@ -152,5 +158,5 @@ export function convertColumn({
 		typeSchema += '.optional()';
 	}
 
-	return typeSchema;
+	return `${columnName}: ${typeSchema}`;
 }

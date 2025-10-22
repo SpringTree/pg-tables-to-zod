@@ -1,5 +1,5 @@
 import pgStructure, { type Schema } from 'pg-structure';
-import { Project, ScriptTarget } from 'ts-morph';
+import { Project } from 'ts-morph';
 import { checkConfiguration } from '../config/check.js';
 import type { TConfiguration } from '../config/index.js';
 import { convertEntity } from './entity.js';
@@ -46,7 +46,6 @@ export async function convert(
 		compilerOptions: {
 			declaration: false,
 			outDir: outputFolder || 'dist/validators',
-			target: ScriptTarget.ES2024,
 		},
 	});
 
@@ -135,16 +134,13 @@ export async function convert(
 	// Output the project to memory to return it
 	// Also saving to disk if an output folder is specified
 	//
-	const result = await project.emitToMemory();
-
+	const files = project.getSourceFiles();
 	if (outputFolder) {
 		console.warn(`Outputting files to ${outputFolder}`);
-		await result.saveFiles();
+		await project.save();
 	}
-
-	const files = result.getFiles();
 	return files.map((file) => ({
-		path: file.filePath,
-		schema: file.text,
+		path: file.getFilePath(),
+		schema: file.getFullText(),
 	}));
 }

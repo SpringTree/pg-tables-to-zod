@@ -35,6 +35,8 @@ pgtables2zod --pg-host localhost --pg-user admin --pg-password secret --pg-datab
 
 The above example will connect to the Postgresql instance on `localhost` and output Zod schemas for all tables and views in `my_schema` to the `test/` directory.
 Calling with -h will provide you with all the possible parameters and options.
+Using with the `-c my-config.json` option most convenient.
+If there is no password in the configuration file you will be prompted to enter it.
 
 ## :hammer: Development
 
@@ -45,7 +47,12 @@ Run:
 bun install
 ```
 
-TODO: howto develop
+Please look at `example-config.json` for how to setup a configuration file.
+You can then use bun run to test and generate output:
+
+```bash
+bun run src/cli.ts -c my-config.json
+```
 
 ### :cool: Technology stack
 
