@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import pg from './database';
-import input from './input';
-import output from './output';
+import pg from './database.js';
+import input from './input.js';
+import output from './output.js';
 
 const configurationSchema = z
 	.object({
