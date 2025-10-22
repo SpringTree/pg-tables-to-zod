@@ -2,15 +2,21 @@
 
 ## :evergreen_tree: Purpose
 
-A command-line utility and module to turn postgres tables into Zod schemas
+A command-line utility and module to turn postgres tables into Zod (v4) schemas
 
 ## :seedling: Getting started
 
 You can use this project as a dependency for your project:
 
 ```bash
+# Bun
 bun add pg-tables-to-zod
+
+# Node.js
+npm install pg-tables-to-zod
 ```
+
+You can use the converter as a module:
 
 ```typescript
 import { convert, type TConfiguration } from 'pg-tables-to-zod';
@@ -48,7 +54,7 @@ bun install
 ```
 
 Please look at `example-config.json` for how to setup a configuration file.
-You can then use bun run to test and generate output:
+You can then use bun run to generate output schemas and validate any code changes:
 
 ```bash
 bun run src/cli.ts -c my-config.json
@@ -68,8 +74,8 @@ All changes need to be done through a reviewed pull request.
 
 ## :up: Deploying
 
-The package is currently published to npm manually from the `main` branch.
-Be sure to run `bun run build` and `bun run release` before publishing.
+The package is npm automatically when a new version tag is added.
+This can be done using the `bun run release` script before pushing to main.
 
 ## Contributing
 
