@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod';
 
 const inputConfigurationSchema = z
 	.object({
@@ -20,7 +20,7 @@ const inputConfigurationSchema = z
 			),
 	})
 	.strict()
-	.describe('Database setting configuration')
+	.describe('Database setting configuration');
 
-export type TInputConfiguration = z.infer<typeof inputConfigurationSchema>
-export default inputConfigurationSchema
+export type TInputConfiguration = z.infer<typeof inputConfigurationSchema>;
+export default inputConfigurationSchema;

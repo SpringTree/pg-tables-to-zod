@@ -1,7 +1,7 @@
-import { z } from 'zod'
-import pg from './database'
-import input from './input'
-import output from './output'
+import { z } from 'zod';
+import pg from './database';
+import input from './input';
+import output from './output';
 
 const configurationSchema = z
 	.object({
@@ -10,7 +10,7 @@ const configurationSchema = z
 		output,
 	})
 	.strict()
-	.describe('Overall configuration schema')
+	.describe('Overall configuration schema');
 
-export type TConfiguration = z.infer<typeof configurationSchema>
-export default configurationSchema
+export type TConfiguration = z.infer<typeof configurationSchema>;
+export default configurationSchema;

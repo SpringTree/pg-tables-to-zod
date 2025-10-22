@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod';
 
 const outputConfigurationSchema = z
 	.object({
@@ -12,7 +12,7 @@ const outputConfigurationSchema = z
 			.boolean()
 			.optional()
 			.describe(
-				'If a single schema is converted and output to STDOUT you can enable this flag to unwrap the schema from the normally output array',
+				'If a single schema is converted and output to STDOUT you can enable this flag to unwrap the schema from the output array',
 			),
 		strict: z
 			.boolean()
@@ -28,7 +28,7 @@ const outputConfigurationSchema = z
 			),
 	})
 	.strict()
-	.describe('Database setting configuration')
+	.describe('Database setting configuration');
 
-export type TOutputConfiguration = z.infer<typeof outputConfigurationSchema>
-export default outputConfigurationSchema
+export type TOutputConfiguration = z.infer<typeof outputConfigurationSchema>;
+export default outputConfigurationSchema;

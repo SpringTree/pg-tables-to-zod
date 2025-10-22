@@ -1,9 +1,11 @@
-import { program } from 'commander'
-import prompts from 'prompts'
-import { z } from 'zod'
-import { version } from '../package.json'
-import configurationSchema, { type TConfiguration } from './config/index.js'
-import { readConfigFile } from './config/read-file.js'
+import { program } from 'commander';
+import prompts from 'prompts';
+import { z } from 'zod';
+import { version } from '../package.json';
+import { checkConfiguration } from './config/check.js';
+import type { TConfiguration } from './config/index.js';
+import { readConfigFile } from './config/read-file.js';
+import { convert } from './converter/index.js';
 
 // Collect command-line options and arguments
 //
@@ -40,20 +42,17 @@ program
 		'Comma separated list of tables to exclude. Default is to not exclude any',
 	)
 	.option('-u, --unwrap', 'Unwraps the schema if only 1 is returned')
-	.option(
-		'-d, --desc <value>',
-		'Default description when database lacks one. Defaults to current date/time',
-	)
+	.option('-d, --desc <value>', 'Default description when database lacks one.')
 
-	.parse(process.argv)
+	.parse(process.argv);
 
-program.parse()
+program.parse();
 
-const options = program.opts()
+const options = program.opts();
 
 if (Object.keys(options).length === 0) {
-	program.help()
-	process.exit(1)
+	program.help();
+	process.exit(1);
 }
 
 const {
@@ -70,7 +69,7 @@ const {
 	excludeTables,
 	unwrap,
 	desc,
-} = options
+} = options;
 
 let configuration: TConfiguration = {
 	pg: {
@@ -91,12 +90,12 @@ let configuration: TConfiguration = {
 		strict: strict,
 		defaultDescription: desc,
 	},
-}
+};
 if (config) {
 	try {
 		// Apply the configuration file values, overridden by CLI options
 		//
-		const configFromFile = await readConfigFile(config)
+		const configFromFile = await readConfigFile(config);
 		configuration = {
 			pg: {
 				...configFromFile.pg,
@@ -110,10 +109,10 @@ if (config) {
 				...configFromFile.output,
 				...configuration.output,
 			},
-		}
+		};
 	} catch (error) {
-		console.error(`Failed to read configuration file at ${config}:`, error)
-		process.exit(1)
+		console.error(`Failed to read configuration file at ${config}:`, error);
+		process.exit(1);
 	}
 }
 
@@ -124,20 +123,46 @@ if (!configuration.pg.password) {
 		type: 'password',
 		name: 'password',
 		message: 'Password?',
-	})
+	});
 
-	configuration.pg.password = response.password
+	configuration.pg.password = response.password;
 }
 
 // Check the configuration using Zod
 //
 try {
-	configurationSchema.parse(configuration)
+	checkConfiguration(configuration);
 } catch (error) {
 	if (error instanceof z.ZodError) {
-		console.error('Configuration has issues:', error.issues)
+		console.error('Configuration has issues:', error.issues);
 	} else {
-		console.error('Configuration is invalid:', error)
+		console.error('Configuration is invalid:', error);
 	}
-	process.exit(1)
+	process.exit(1);
+}
+
+// Generate the schemas either to disk or memory depending on the configuration settings
+//
+try {
+	const outputSchemas = await convert(configuration);
+	const outputFolder = configuration.output?.outDir;
+	const unwrap = configuration.output?.unwrap ?? false;
+
+	if (!outputFolder) {
+		if (unwrap && outputSchemas.length === 1) {
+			console.log(outputSchemas[0]);
+		} else if (outputSchemas.length > 0) {
+			console.log(JSON.stringify(outputSchemas, null, 2));
+		}
+	} else {
+		console.log(
+			`Conversion completed successfully. Files are saved in ${outputFolder}`,
+		);
+	}
+} catch (error) {
+	console.error(`Conversion failed: ${error}`);
+	console.error(
+		'Suggestion: Run with --help for parameters or check supplied configuration',
+	);
+	process.exit(-1);
 }

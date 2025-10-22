@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod';
 
 const databaseConfigSchema = z
 	.object({
@@ -14,7 +14,7 @@ const databaseConfigSchema = z
 		password: z.string().min(6).max(100).describe('Database password'),
 	})
 	.strict()
-	.describe('Database setting configuration')
+	.describe('Database setting configuration');
 
-export type TDatabaseConfiguration = z.infer<typeof databaseConfigSchema>
-export default databaseConfigSchema
+export type TDatabaseConfiguration = z.infer<typeof databaseConfigSchema>;
+export default databaseConfigSchema;
