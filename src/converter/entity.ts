@@ -55,7 +55,7 @@ export function convertEntity({
 	//
 	const schemaInitializer = `z
 	.object({
-		${columnSchemaCode.join(',\n')}
+		${columnSchemaCode.join(',\n		')}
 	})
 	${strict ? '.strict()' : ''}
 	.describe('${entity.comment || defaultDescription || `No description available for ${entity.name}`}');`;
