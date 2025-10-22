@@ -1,20 +1,68 @@
 # pg-tables-to-zod
 
+## :evergreen_tree: Purpose
+
 A command-line utility and module to turn postgres tables into Zod schemas
 
-## Installation
+## :seedling: Getting started
+
+You can use this project as a dependency for your project:
 
 ```bash
 bun add pg-tables-to-zod
 ```
 
-## Usage
-
 ```typescript
-import { greet } from 'pg-tables-to-zod';
+import { convert, type TConfiguration } from 'pg-tables-to-zod';
 
-console.log(greet('World')); // Hello, World!
+const configuration: TConfiguration = {
+	...
+}
+
+const outputSchemas = await convert(configuration);
+
+outputSchemas.map((outputSchema) => {
+	console.log(`Schema file: ${outputSchema.path}`);
+	console.log(`Schema contents: ${outputSchema.schema}`);
+})
 ```
+
+Or as a CLI command:
+
+```bash
+pgtables2zod --pg-host localhost --pg-user admin --pg-password secret --pg-database my-db --pg-schema my_schema -o test/
+```
+
+The above example will connect to the Postgresql instance on `localhost` and output Zod schemas for all tables and views in `my_schema` to the `test/` directory.
+Calling with -h will provide you with all the possible parameters and options.
+
+## :hammer: Development
+
+Run:
+
+```bash
+# Install dependencies
+bun install
+```
+
+TODO: howto develop
+
+### :cool: Technology stack
+
+* bun
+* typescript
+* zod
+* pg-structure
+
+### :twisted_rightwards_arrows: Branch strategy and protection
+
+The `main` branch has protection enabled against direct pushes.
+All changes need to be done through a reviewed pull request.
+
+## :up: Deploying
+
+The package is currently published to npm manually from the `main` branch.
+Be sure to run `bun run build` and `bun run release` before publishing.
 
 ## Contributing
 

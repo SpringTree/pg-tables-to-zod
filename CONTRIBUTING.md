@@ -14,7 +14,6 @@ Thank you for your interest in contributing to our project! This guide will help
 2. Clone your fork: `git clone https://github.com/springtree/pg-tables-to-zod.git`
 3. Navigate to the project directory: `cd pg-tables-to-zod`
 4. Install dependencies: `bun install`
-5. Start development: `bun run dev`
 
 ## Development Workflow
 

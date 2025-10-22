@@ -1,6 +1,7 @@
 import { expect, test } from 'bun:test';
-import { greet } from '../src';
+import { configurationSchema, convert } from '../src';
 
-test('should greet correctly', () => {
-	expect(greet('World')).toBe('Hello, World!');
+test('exports should be defined', () => {
+	expect(convert).toBeDefined();
+	expect(configurationSchema).toBeDefined();
 });
