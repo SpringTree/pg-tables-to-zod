@@ -24,13 +24,12 @@ export function convertEntity({
 	entity: Entity;
 }) {
 	const entityName = entity.name;
-	const baseName = entityName.replace(`${schemaName}_`, '');
-	const variableName = camelCase(baseName);
+	const variableName = camelCase(entityName);
 
 	// Each entity schema will end up in its own file
 	//
 	const folderName = join(outputFolder ?? '.', schemaName);
-	const fileName = join(folderName, `${baseName}.ts`);
+	const fileName = join(folderName, `${entityName}.ts`);
 
 	const sourceFile = project.createSourceFile(fileName);
 

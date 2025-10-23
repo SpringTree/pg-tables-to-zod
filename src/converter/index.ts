@@ -64,11 +64,11 @@ export async function convert(
 			// Check if the entity is included and/or excluded
 			//
 			if (
-				excludedEntities.indexOf(tableName) === -1 &&
+				excludedEntities.indexOf(`${schemaName}.${tableName}`) === -1 &&
 				(includedEntities.length === 0 ||
-					includedEntities.indexOf(tableName) !== -1)
+					includedEntities.indexOf(`${schemaName}.${tableName}`) !== -1)
 			) {
-				console.warn(`Processing table ${tableName}`);
+				console.warn(`Processing table ${schemaName}/${tableName}`);
 				convertEntity({
 					project,
 					strict,
@@ -90,11 +90,11 @@ export async function convert(
 			// Check if the entity is included and/or excluded
 			//
 			if (
-				excludedEntities.indexOf(viewName) === -1 &&
+				excludedEntities.indexOf(`${schemaName}.${viewName}`) === -1 &&
 				(includedEntities.length === 0 ||
-					includedEntities.indexOf(viewName) !== -1)
+					includedEntities.indexOf(`${schemaName}.${viewName}`) !== -1)
 			) {
-				console.warn(`Processing view ${viewName}`);
+				console.warn(`Processing view ${schemaName}/${viewName}`);
 				convertEntity({
 					project,
 					strict,
@@ -114,11 +114,11 @@ export async function convert(
 			// Check if the entity is included and/or excluded
 			//
 			if (
-				excludedEntities.indexOf(viewName) === -1 &&
+				excludedEntities.indexOf(`${schemaName}.${viewName}`) === -1 &&
 				(includedEntities.length === 0 ||
-					includedEntities.indexOf(viewName) !== -1)
+					includedEntities.indexOf(`${schemaName}.${viewName}`) !== -1)
 			) {
-				console.warn(`Processing materialized view ${viewName}`);
+				console.warn(`Processing materialized view ${schemaName}/${viewName}`);
 				convertEntity({
 					project,
 					strict,
