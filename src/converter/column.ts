@@ -128,16 +128,16 @@ export function convertColumn({
 					const values = enumType.values;
 					const isNumeric = !!enumType.numericType;
 					if (isNumeric) {
-						typeSchema = `z.literal(${Array.from(values.keys())})`;
+						typeSchema = `z.literal([${Array.from(values.keys()).map((value) => `'${value}'`)}])`;
 					} else {
-						typeSchema = `z.enum(${values})`;
+						typeSchema = `z.enum([${values.map((value) => `'${value}'`)}])`;
 					}
+				} else {
+					console.warn(
+						`Unsupported column type: ${columnType}. Defaulting to any`,
+					);
+					typeSchema = `z.any()`;
 				}
-
-				console.warn(
-					`Unsupported column type: ${columnType}. Defaulting to any`,
-				);
-				typeSchema = `z.any()`;
 			}
 			break;
 	}
