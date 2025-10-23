@@ -3,6 +3,7 @@ import { Project } from 'ts-morph';
 import { checkConfiguration } from '../config/check.js';
 import type { TConfiguration } from '../config/index.js';
 import { convertEntity } from './entity.js';
+import { addSharedTypesFile } from './shared-types.js';
 
 export interface IOutputZodSchema {
 	// Output file path and name
@@ -39,14 +40,23 @@ export async function convert(
 	const includedEntities = configuration.input?.include || [];
 	const excludedEntities = configuration.input?.exclude || [];
 
-	const outputFolder = configuration.output?.outDir;
+	const outputFolder = configuration.output?.outDir || 'dist/validators';
 	const defaultDescription = configuration.output?.defaultDescription;
 	const strict = configuration.output?.strict !== false;
 	const project = new Project({
 		compilerOptions: {
 			declaration: false,
-			outDir: outputFolder || 'dist/validators',
+			outDir: outputFolder,
 		},
+	});
+
+	// Add and prepare the shared PostgreSQL types and enums file
+	// This file will contain reusable Zod schemas for PostgreSQL types
+	// such as the interval type and any enums found in the database
+	//
+	const sharedTypesFile = addSharedTypesFile({
+		project,
+		outputFolder,
 	});
 
 	// Iterate all the schemas
@@ -76,6 +86,7 @@ export async function convert(
 					outputFolder,
 					schemaName,
 					entity: table,
+					sharedTypesFile,
 				});
 			} else {
 				console.warn(`Skipping excluded table ${tableName}`);
@@ -102,6 +113,7 @@ export async function convert(
 					outputFolder,
 					schemaName,
 					entity: view,
+					sharedTypesFile,
 				});
 			}
 		}
@@ -126,16 +138,16 @@ export async function convert(
 					outputFolder,
 					schemaName,
 					entity: view,
+					sharedTypesFile,
 				});
 			}
 		}
 	}
 
-	// Output the project to memory to return it
-	// Also saving to disk if an output folder is specified
+	// Saving to disk if an output folder is specified in the configuration options
 	//
 	const files = project.getSourceFiles();
-	if (outputFolder) {
+	if (configuration.output?.outDir) {
 		console.warn(`Outputting files to ${outputFolder}`);
 		await project.save();
 	}

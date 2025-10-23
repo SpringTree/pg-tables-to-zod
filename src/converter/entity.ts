@@ -1,7 +1,11 @@
 import { join } from 'node:path';
 import { camelCase, upperFirst } from 'lodash-es';
 import type { Entity } from 'pg-structure';
-import { type Project, VariableDeclarationKind } from 'ts-morph';
+import {
+	type Project,
+	type SourceFile,
+	VariableDeclarationKind,
+} from 'ts-morph';
 import { convertColumn } from './column.js';
 import escapeSingleQuotes from './escape-single-quotes.js';
 
@@ -16,20 +20,23 @@ export function convertEntity({
 	outputFolder,
 	schemaName,
 	entity,
+	sharedTypesFile,
 }: {
 	project: Project;
 	strict: boolean;
 	defaultDescription?: string;
-	outputFolder?: string;
+	outputFolder: string;
 	schemaName: string;
 	entity: Entity;
+	sharedTypesFile: SourceFile;
 }) {
 	const entityName = entity.name;
 	const variableName = camelCase(entityName);
+	const columns = entity.columns;
 
 	// Each entity schema will end up in its own file
 	//
-	const folderName = join(outputFolder ?? '.', schemaName);
+	const folderName = join(outputFolder, schemaName);
 	const fileName = join(folderName, `${entityName}.ts`);
 
 	const sourceFile = project.createSourceFile(fileName);
@@ -40,13 +47,26 @@ export function convertEntity({
 		namedImports: ['z'],
 	});
 
-	const columns = entity.columns;
+	// Check if any of the columns are using the PostgresqlInterval type
+	// If so, import it from the shared types file
+	//
+	const usesPostgresqlInterval = columns.some(
+		(column) => column.type.name === 'interval',
+	);
+	if (usesPostgresqlInterval) {
+		sourceFile.addImportDeclaration({
+			moduleSpecifier: sharedTypesFile.getFilePath(),
+			namedImports: ['PostgresqlIntervalSchema'],
+		});
+	}
+
 	const columnSchemaCode: string[] = [];
 	for (const column of columns) {
 		columnSchemaCode.push(
 			convertColumn({
 				column,
 				defaultDescription,
+				sharedTypesFile,
 			}),
 		);
 	}

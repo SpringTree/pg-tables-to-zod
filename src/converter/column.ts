@@ -1,5 +1,7 @@
 import { type Column, EnumType } from 'pg-structure';
+import type { SourceFile } from 'ts-morph';
 import escapeSingleQuotes from './escape-single-quotes.js';
+import { addEnum } from './shared-types.js';
 
 /**
  * Helper method to convert a postgresql column to a Zod schema object property.
@@ -9,9 +11,11 @@ import escapeSingleQuotes from './escape-single-quotes.js';
 export function convertColumn({
 	column,
 	defaultDescription,
+	sharedTypesFile,
 }: {
 	column: Column;
 	defaultDescription?: string;
+	sharedTypesFile: SourceFile;
 }): string {
 	const columnName = column.name;
 	const columnType = column.type.name;
@@ -99,34 +103,18 @@ export function convertColumn({
 
 		case 'interval':
 			{
-				typeSchema = `z.union([
-				z.number().describe('Interval duration in seconds'),
-				z.string().describe('Descriptive interval duration i.e. 8 hours'),
-				z
-					.object({
-						years: z.number().optional(),
-						months: z.number().optional(),
-						days: z.number().optional(),
-						hours: z.number().optional(),
-						minutes: z.number().optional(),
-						seconds: z.number().optional(),
-						milliseconds: z.number().optional(),
-					})
-					.describe('Interval duration as an object'),
-			])`;
+				// Use the reusable PostgresqlIntervalSchema from the shared types file
+				// The convertEntity method should ensure that the shared types file is imported
+				// if any columns are using the interval type
+				//
+				typeSchema = `PostgresqlIntervalSchema`;
 			}
 			break;
 
 		default:
 			{
 				if (enumType) {
-					const values = enumType.values;
-					const isNumeric = !!enumType.numericType;
-					if (isNumeric) {
-						typeSchema = `z.literal([${Array.from(values.keys()).map((value) => `'${value}'`)}])`;
-					} else {
-						typeSchema = `z.enum([${values.map((value) => `'${value}'`)}])`;
-					}
+					addEnum({ sharedTypesFile, columnType, enumType });
 				} else {
 					console.warn(
 						`Unsupported column type: ${columnType}. Defaulting to any`,
