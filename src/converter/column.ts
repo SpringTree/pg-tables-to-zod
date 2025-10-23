@@ -93,7 +93,7 @@ export function convertColumn({
 		case 'json':
 		case 'jsonb':
 			{
-				typeSchema = `z.object()`;
+				typeSchema = `z.json()`;
 			}
 			break;
 
