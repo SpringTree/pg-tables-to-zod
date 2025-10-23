@@ -3,6 +3,7 @@ import { camelCase, upperFirst } from 'lodash-es';
 import type { Entity } from 'pg-structure';
 import { type Project, VariableDeclarationKind } from 'ts-morph';
 import { convertColumn } from './column.js';
+import escapeSingleQuotes from './escape-single-quotes.js';
 
 // Helper method to convert a postgresql table to a Zod schema
 // Which will be added to the ts-morph project to be output either
@@ -57,7 +58,7 @@ export function convertEntity({
 		${columnSchemaCode.join(',\n		')}
 	})
 	${strict ? '.strict()' : ''}
-	.describe('${entity.comment || defaultDescription || `No description available for ${entity.name}`}');`;
+	.describe('${escapeSingleQuotes(entity.comment || defaultDescription || `No description available for ${entity.name}`)}');`;
 
 	sourceFile.addVariableStatement({
 		declarationKind: VariableDeclarationKind.Const,

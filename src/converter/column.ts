@@ -1,10 +1,5 @@
 import { type Column, EnumType } from 'pg-structure';
-
-function escapeSingleQuotes(
-	str: string | number | null | boolean | undefined,
-): string {
-	return (str?.toString() ?? '').replace(/'/g, "\\'");
-}
+import escapeSingleQuotes from './escape-single-quotes.js';
 
 /**
  * Helper method to convert a postgresql column to a Zod schema object property.
