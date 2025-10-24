@@ -12,10 +12,12 @@ export function convertColumn({
 	column,
 	defaultDescription,
 	sharedTypesFile,
+	sourceFile,
 }: {
 	column: Column;
 	defaultDescription?: string;
 	sharedTypesFile: SourceFile;
+	sourceFile: SourceFile;
 }): string {
 	const columnName = column.name;
 	const columnType = column.type.name;
@@ -114,7 +116,12 @@ export function convertColumn({
 		default:
 			{
 				if (enumType) {
-					addEnum({ sharedTypesFile, columnType, enumType });
+					typeSchema = addEnum({
+						columnType,
+						enumType,
+						sharedTypesFile,
+						sourceFile,
+					});
 				} else {
 					console.warn(
 						`Unsupported column type: ${columnType}. Defaulting to any`,

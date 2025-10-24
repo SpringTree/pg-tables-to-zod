@@ -65,23 +65,24 @@ export function addSharedTypesFile({
 }
 
 export function addEnum({
-	sharedTypesFile,
 	columnType,
 	enumType,
+	sharedTypesFile,
+	sourceFile,
 }: {
-	sharedTypesFile: SourceFile;
 	columnType: string;
 	enumType: EnumType;
+	sharedTypesFile: SourceFile;
+	sourceFile: SourceFile;
 }) {
 	const enumName = `${upperFirst(camelCase(columnType))}`;
 	const existingVariables = sharedTypesFile.getVariableDeclarations();
+	const schemaName = `${enumName}Schema`;
 
 	// Only add the enum if it doesn't already exist in the shared types file
 	//
 	if (
-		!existingVariables.some(
-			(variable) => variable.getName() === `${enumName}Schema`,
-		)
+		!existingVariables.some((variable) => variable.getName() === schemaName)
 	) {
 		const values = enumType.values;
 		const isNumeric = !!enumType.numericType;
@@ -94,7 +95,7 @@ export function addEnum({
 			declarationKind: VariableDeclarationKind.Const,
 			declarations: [
 				{
-					name: `${enumName}Schema`,
+					name: schemaName,
 					initializer: enumInitializer,
 				},
 			],
@@ -105,7 +106,18 @@ export function addEnum({
 		sharedTypesFile.addTypeAlias({
 			name: `E${enumName}`,
 			isExported: true,
-			type: `z.infer<typeof ${enumName}Schema>`,
+			type: `z.infer<typeof ${schemaName}>`,
+		});
+
+		// Import the enum schema into the source file
+		//
+		sourceFile.addImportDeclaration({
+			moduleSpecifier: sourceFile
+				.getRelativePathTo(sharedTypesFile)
+				.replace(/\.ts$/, '.js'),
+			namedImports: [schemaName],
 		});
 	}
+
+	return schemaName;
 }

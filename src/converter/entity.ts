@@ -67,6 +67,7 @@ export function convertEntity({
 				column,
 				defaultDescription,
 				sharedTypesFile,
+				sourceFile,
 			}),
 		);
 	}
@@ -78,7 +79,7 @@ export function convertEntity({
 		${columnSchemaCode.join(',\n		')}
 	})
 	${strict ? '.strict()' : ''}
-	.describe('${escapeSingleQuotes(entity.comment || defaultDescription || `No description available for ${entity.name}`)}');`;
+	.describe('${escapeSingleQuotes(entity.comment || defaultDescription || `No description available for ${entity.name}`)}')`;
 
 	sourceFile.addVariableStatement({
 		declarationKind: VariableDeclarationKind.Const,
