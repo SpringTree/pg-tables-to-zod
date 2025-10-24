@@ -108,9 +108,18 @@ export function addEnum({
 			isExported: true,
 			type: `z.infer<typeof ${schemaName}>`,
 		});
+	}
 
-		// Import the enum schema into the source file
-		//
+	// Import the enum schema into the source file if not already imported
+	//
+	const existingImports = sourceFile.getImportDeclarations();
+	const isAlreadyImported = existingImports.some((importDecl) => {
+		const namedImports = importDecl.getNamedImports();
+		return namedImports.some(
+			(namedImport) => namedImport.getName() === schemaName,
+		);
+	});
+	if (!isAlreadyImported) {
 		sourceFile.addImportDeclaration({
 			moduleSpecifier: sourceFile
 				.getRelativePathTo(sharedTypesFile)
