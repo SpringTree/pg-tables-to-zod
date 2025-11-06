@@ -121,6 +121,7 @@ export function convertColumn({
 						enumType,
 						sharedTypesFile,
 						sourceFile,
+						description: enumType.comment,
 					});
 				} else {
 					console.warn(
