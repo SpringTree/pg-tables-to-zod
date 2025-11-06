@@ -23,13 +23,36 @@ export function addSharedTypesFile({
 		namedImports: ['z'],
 	});
 
+	// Declare the json type
+	//
+	const jsonTypeInitializer = `z.json().describe('Postgresql JSON type')`;
+
+	// Add: export const JsonTypeSchema = ...
+	sourceFile.addVariableStatement({
+		declarationKind: VariableDeclarationKind.Const,
+		declarations: [
+			{
+				name: `JsonTypeSchema`,
+				initializer: jsonTypeInitializer,
+			},
+		],
+		isExported: true,
+	});
+
+	// Add: export type TJsonType = z.infer<typeof JsonTypeSchema>;
+	sourceFile.addTypeAlias({
+		name: `TJsonType`,
+		isExported: true,
+		type: `z.infer<typeof JsonTypeSchema>`,
+	});
+
 	// Declare the postgresql interval type
 	//
 	const postgresqlIntervalInitializer = `z.union([
 		z.number().describe('Interval duration in seconds'),
 		z.string().describe('Descriptive interval duration i.e. 8 hours'),
 		z
-			.object({
+			.strictObject({
 				years: z.number().optional(),
 				months: z.number().optional(),
 				days: z.number().optional(),
@@ -40,7 +63,7 @@ export function addSharedTypesFile({
 			})
 			.describe('Interval duration as an object'),
 	])
-	.describe('Postgresql interval type');`;
+	.describe('Postgresql interval type')`;
 
 	// Add: export const PostgresqlIntervalSchema = ...
 	sourceFile.addVariableStatement({
