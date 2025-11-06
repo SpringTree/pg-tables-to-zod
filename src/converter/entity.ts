@@ -75,7 +75,7 @@ export function convertEntity({
 	// Add the zod schema constant
 	//
 	const schemaInitializer = `z
-	.${strict ? '.strictObject' : 'object'}({
+	.${strict ? 'strictObject' : 'object'}({
 		${columnSchemaCode.join(',\n		')}
 	})
 	.describe('${escapeSingleQuotes(entity.comment || defaultDescription || `No description available for ${entity.name}`)}')`;
