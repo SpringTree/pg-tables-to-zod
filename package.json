@@ -1,6 +1,6 @@
 {
 	"name": "pg-tables-to-zod",
-	"version": "1.0.6",
+	"version": "1.0.7",
 	"description": "A command-line utility and module to turn postgres tables into Zod schemas",
 	"homepage": "https://github.com/springtree/pg-tables-to-zod#readme",
 	"bugs": {
