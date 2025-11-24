@@ -55,7 +55,9 @@ export function convertEntity({
 	);
 	if (usesPostgresqlInterval) {
 		sourceFile.addImportDeclaration({
-			moduleSpecifier: sharedTypesFile.getFilePath(),
+			moduleSpecifier: sourceFile
+				.getRelativePathTo(sharedTypesFile)
+				.replace(/\.ts$/, '.js'),
 			namedImports: ['PostgresqlIntervalSchema'],
 		});
 	}
