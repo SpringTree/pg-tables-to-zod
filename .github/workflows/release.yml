@@ -47,6 +47,6 @@ jobs:
 
       - name: Publish to npm
         run: bun publish --access public --no-git-checks
-        env:
-          NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
+        # env:
+        #   NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
+        #   NPM_CONFIG_PROVENANCE: true
