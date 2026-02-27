@@ -47,7 +47,7 @@
 	},
 	"type": "module",
 	"bin": {
-		"pgtables2zod": "./dist/cli.js"
+		"pgtables2zod": "dist/cli.js"
 	},
 	"exports": {
 		".": {
