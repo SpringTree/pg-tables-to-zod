@@ -1,51 +1,51 @@
-import { join } from 'node:path';
-import { camelCase, upperFirst } from 'lodash-es';
-import type { EnumType } from 'pg-structure';
-import { type Project, type SourceFile, VariableDeclarationKind } from 'ts-morph';
-import escapeSingleQuotes from './escape-single-quotes';
+import { join } from "node:path";
+import { camelCase, upperFirst } from "lodash-es";
+import type { EnumType } from "pg-structure";
+import { type Project, type SourceFile, VariableDeclarationKind } from "ts-morph";
+import escapeSingleQuotes from "./escape-single-quotes";
 
 export function addSharedTypesFile({
-	project,
-	outputFolder,
+  project,
+  outputFolder,
 }: {
-	project: Project;
-	outputFolder: string;
+  project: Project;
+  outputFolder: string;
 }) {
-	const fileName = join(outputFolder, `pg-types.ts`);
-	const sourceFile = project.createSourceFile(fileName);
+  const fileName = join(outputFolder, `pg-types.ts`);
+  const sourceFile = project.createSourceFile(fileName);
 
-	// Add: import { z } from 'zod';
-	sourceFile.addImportDeclaration({
-		moduleSpecifier: 'zod',
-		namedImports: ['z'],
-	});
+  // Add: import { z } from 'zod';
+  sourceFile.addImportDeclaration({
+    moduleSpecifier: "zod",
+    namedImports: ["z"],
+  });
 
-	// Declare the json type
-	//
-	const jsonTypeInitializer = `z.json().describe('Postgresql JSON type')`;
+  // Declare the json type
+  //
+  const jsonTypeInitializer = `z.json().describe('Postgresql JSON type')`;
 
-	// Add: export const JsonTypeSchema = ...
-	sourceFile.addVariableStatement({
-		declarationKind: VariableDeclarationKind.Const,
-		declarations: [
-			{
-				name: `JsonTypeSchema`,
-				initializer: jsonTypeInitializer,
-			},
-		],
-		isExported: true,
-	});
+  // Add: export const JsonTypeSchema = ...
+  sourceFile.addVariableStatement({
+    declarationKind: VariableDeclarationKind.Const,
+    declarations: [
+      {
+        name: `JsonTypeSchema`,
+        initializer: jsonTypeInitializer,
+      },
+    ],
+    isExported: true,
+  });
 
-	// Add: export type TJsonType = z.infer<typeof JsonTypeSchema>;
-	sourceFile.addTypeAlias({
-		name: `TJsonType`,
-		isExported: true,
-		type: `z.infer<typeof JsonTypeSchema>`,
-	});
+  // Add: export type TJsonType = z.infer<typeof JsonTypeSchema>;
+  sourceFile.addTypeAlias({
+    name: `TJsonType`,
+    isExported: true,
+    type: `z.infer<typeof JsonTypeSchema>`,
+  });
 
-	// Declare the postgresql interval type
-	//
-	const postgresqlIntervalInitializer = `z.union([
+  // Declare the postgresql interval type
+  //
+  const postgresqlIntervalInitializer = `z.union([
 		z.number().describe('Interval duration in seconds'),
 		z.string().describe('Descriptive interval duration i.e. 8 hours'),
 		z
@@ -62,92 +62,92 @@ export function addSharedTypesFile({
 	])
 	.describe('Postgresql interval type')`;
 
-	// Add: export const PostgresqlIntervalSchema = ...
-	sourceFile.addVariableStatement({
-		declarationKind: VariableDeclarationKind.Const,
-		declarations: [
-			{
-				name: `PostgresqlIntervalSchema`,
-				initializer: postgresqlIntervalInitializer,
-			},
-		],
-		isExported: true,
-	});
+  // Add: export const PostgresqlIntervalSchema = ...
+  sourceFile.addVariableStatement({
+    declarationKind: VariableDeclarationKind.Const,
+    declarations: [
+      {
+        name: `PostgresqlIntervalSchema`,
+        initializer: postgresqlIntervalInitializer,
+      },
+    ],
+    isExported: true,
+  });
 
-	// Add: export type TPostgresqlInterval = z.infer<typeof PostgresqlIntervalSchema>;
-	sourceFile.addTypeAlias({
-		name: `TPostgresqlInterval`,
-		isExported: true,
-		type: `z.infer<typeof PostgresqlIntervalSchema>`,
-	});
+  // Add: export type TPostgresqlInterval = z.infer<typeof PostgresqlIntervalSchema>;
+  sourceFile.addTypeAlias({
+    name: `TPostgresqlInterval`,
+    isExported: true,
+    type: `z.infer<typeof PostgresqlIntervalSchema>`,
+  });
 
-	return sourceFile;
+  return sourceFile;
 }
 
 export function addEnum({
-	columnType,
-	description,
-	enumType,
-	sharedTypesFile,
-	sourceFile,
+  columnType,
+  description,
+  enumType,
+  sharedTypesFile,
+  sourceFile,
 }: {
-	columnType: string;
-	description?: string;
-	enumType: EnumType;
-	sharedTypesFile: SourceFile;
-	sourceFile: SourceFile;
+  columnType: string;
+  description?: string;
+  enumType: EnumType;
+  sharedTypesFile: SourceFile;
+  sourceFile: SourceFile;
 }) {
-	const enumName = `${upperFirst(camelCase(columnType))}`;
-	const existingVariables = sharedTypesFile.getVariableDeclarations();
-	const schemaName = `${enumName}Schema`;
+  const enumName = `${upperFirst(camelCase(columnType))}`;
+  const existingVariables = sharedTypesFile.getVariableDeclarations();
+  const schemaName = `${enumName}Schema`;
 
-	// Only add the enum if it doesn't already exist in the shared types file
-	//
-	if (!existingVariables.some((variable) => variable.getName() === schemaName)) {
-		const values = enumType.values;
-		const isNumeric = !!enumType.numericType;
-		let enumInitializer = isNumeric
-			? `z.literal([${Array.from(values.keys())
-					.map((value) => `'${value}'`)
-					.join(',')}])`
-			: `z.enum([${values.map((value) => `'${value}'`).join(',')}])`;
-		if (description) {
-			enumInitializer += `.describe(\`${escapeSingleQuotes(description)}\`)`;
-		}
+  // Only add the enum if it doesn't already exist in the shared types file
+  //
+  if (!existingVariables.some((variable) => variable.getName() === schemaName)) {
+    const values = enumType.values;
+    const isNumeric = !!enumType.numericType;
+    let enumInitializer = isNumeric
+      ? `z.literal([${Array.from(values.keys())
+          .map((value) => `'${value}'`)
+          .join(",")}])`
+      : `z.enum([${values.map((value) => `'${value}'`).join(",")}])`;
+    if (description) {
+      enumInitializer += `.describe(\`${escapeSingleQuotes(description)}\`)`;
+    }
 
-		// Add: export const PostgresqlIntervalSchema = ...
-		sharedTypesFile.addVariableStatement({
-			declarationKind: VariableDeclarationKind.Const,
-			declarations: [
-				{
-					name: schemaName,
-					initializer: enumInitializer,
-				},
-			],
-			isExported: true,
-		});
+    // Add: export const PostgresqlIntervalSchema = ...
+    sharedTypesFile.addVariableStatement({
+      declarationKind: VariableDeclarationKind.Const,
+      declarations: [
+        {
+          name: schemaName,
+          initializer: enumInitializer,
+        },
+      ],
+      isExported: true,
+    });
 
-		// Add: export type E${enumName} = z.infer<typeof ${enumName}Schema>;
-		sharedTypesFile.addTypeAlias({
-			name: `E${enumName}`,
-			isExported: true,
-			type: `z.infer<typeof ${schemaName}>`,
-		});
-	}
+    // Add: export type E${enumName} = z.infer<typeof ${enumName}Schema>;
+    sharedTypesFile.addTypeAlias({
+      name: `E${enumName}`,
+      isExported: true,
+      type: `z.infer<typeof ${schemaName}>`,
+    });
+  }
 
-	// Import the enum schema into the source file if not already imported
-	//
-	const existingImports = sourceFile.getImportDeclarations();
-	const isAlreadyImported = existingImports.some((importDecl) => {
-		const namedImports = importDecl.getNamedImports();
-		return namedImports.some((namedImport) => namedImport.getName() === schemaName);
-	});
-	if (!isAlreadyImported) {
-		sourceFile.addImportDeclaration({
-			moduleSpecifier: sourceFile.getRelativePathTo(sharedTypesFile).replace(/\.ts$/, '.js'),
-			namedImports: [schemaName],
-		});
-	}
+  // Import the enum schema into the source file if not already imported
+  //
+  const existingImports = sourceFile.getImportDeclarations();
+  const isAlreadyImported = existingImports.some((importDecl) => {
+    const namedImports = importDecl.getNamedImports();
+    return namedImports.some((namedImport) => namedImport.getName() === schemaName);
+  });
+  if (!isAlreadyImported) {
+    sourceFile.addImportDeclaration({
+      moduleSpecifier: sourceFile.getRelativePathTo(sharedTypesFile).replace(/\.ts$/, ".js"),
+      namedImports: [schemaName],
+    });
+  }
 
-	return schemaName;
+  return schemaName;
 }

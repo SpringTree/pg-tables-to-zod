@@ -1,156 +1,156 @@
-import pgStructure, { type Schema } from 'pg-structure';
-import { Project } from 'ts-morph';
-import { checkConfiguration } from '../config/check.js';
-import type { TConfiguration } from '../config/index.js';
-import { convertEntity } from './entity.js';
-import { addSharedTypesFile } from './shared-types.js';
+import pgStructure, { type Schema } from "pg-structure";
+import { Project } from "ts-morph";
+import { checkConfiguration } from "../config/check.js";
+import type { TConfiguration } from "../config/index.js";
+import { convertEntity } from "./entity.js";
+import { addSharedTypesFile } from "./shared-types.js";
 
 export interface IOutputZodSchema {
-	// Output file path and name
-	path: string;
-	// The output TypeScript code for the Zod schema
-	schema: string;
+  // Output file path and name
+  path: string;
+  // The output TypeScript code for the Zod schema
+  schema: string;
 }
 
 // Using console.warn on purpose here so that output to stdout can be captured
 // without logging information messages
 //
 export async function convert(configuration: TConfiguration): Promise<IOutputZodSchema[]> {
-	checkConfiguration(configuration);
+  checkConfiguration(configuration);
 
-	console.warn('Connecting to database...');
-	const dbSchemas = configuration.input?.schemas || ['public'];
-	const dbConfig = configuration.pg;
-	const pgStructureDatabase = await pgStructure(
-		{
-			database: dbConfig.database,
-			host: dbConfig.host,
-			port: dbConfig.port,
-			user: dbConfig.user,
-			password: dbConfig.password,
-		},
-		{
-			includeSchemas: dbSchemas,
-			includeSystemSchemas: true,
-		},
-	);
+  console.warn("Connecting to database...");
+  const dbSchemas = configuration.input?.schemas || ["public"];
+  const dbConfig = configuration.pg;
+  const pgStructureDatabase = await pgStructure(
+    {
+      database: dbConfig.database,
+      host: dbConfig.host,
+      port: dbConfig.port,
+      user: dbConfig.user,
+      password: dbConfig.password,
+    },
+    {
+      includeSchemas: dbSchemas,
+      includeSystemSchemas: true,
+    },
+  );
 
-	const includedEntities = configuration.input?.include || [];
-	const excludedEntities = configuration.input?.exclude || [];
+  const includedEntities = configuration.input?.include || [];
+  const excludedEntities = configuration.input?.exclude || [];
 
-	const outputFolder = configuration.output?.outDir || 'dist/validators';
-	const defaultDescription = configuration.output?.defaultDescription;
-	const strict = configuration.output?.strict !== false;
-	const project = new Project({
-		compilerOptions: {
-			declaration: false,
-			outDir: outputFolder,
-		},
-	});
+  const outputFolder = configuration.output?.outDir || "dist/validators";
+  const defaultDescription = configuration.output?.defaultDescription;
+  const strict = configuration.output?.strict !== false;
+  const project = new Project({
+    compilerOptions: {
+      declaration: false,
+      outDir: outputFolder,
+    },
+  });
 
-	// Add and prepare the shared PostgreSQL types and enums file
-	// This file will contain reusable Zod schemas for PostgreSQL types
-	// such as the interval type and any enums found in the database
-	//
-	const sharedTypesFile = addSharedTypesFile({
-		project,
-		outputFolder,
-	});
+  // Add and prepare the shared PostgreSQL types and enums file
+  // This file will contain reusable Zod schemas for PostgreSQL types
+  // such as the interval type and any enums found in the database
+  //
+  const sharedTypesFile = addSharedTypesFile({
+    project,
+    outputFolder,
+  });
 
-	// Iterate all the schemas
-	//
-	for (const dbSchema of dbSchemas) {
-		console.warn(`Processing schema ${dbSchema}`);
-		const schema = pgStructureDatabase.get(dbSchema) as Schema;
-		const schemaName = schema.name;
+  // Iterate all the schemas
+  //
+  for (const dbSchema of dbSchemas) {
+    console.warn(`Processing schema ${dbSchema}`);
+    const schema = pgStructureDatabase.get(dbSchema) as Schema;
+    const schemaName = schema.name;
 
-		// Process all the tables in the schema
-		//
-		for (const table of schema.tables) {
-			const tableName = table.name;
+    // Process all the tables in the schema
+    //
+    for (const table of schema.tables) {
+      const tableName = table.name;
 
-			// Check if the entity is included and/or excluded
-			//
-			if (
-				excludedEntities.indexOf(`${schemaName}.${tableName}`) === -1 &&
-				(includedEntities.length === 0 ||
-					includedEntities.indexOf(`${schemaName}.${tableName}`) !== -1)
-			) {
-				console.warn(`Processing table ${schemaName}/${tableName}`);
-				convertEntity({
-					project,
-					strict,
-					defaultDescription,
-					outputFolder,
-					schemaName,
-					entity: table,
-					sharedTypesFile,
-				});
-			} else {
-				console.warn(`Skipping excluded table ${tableName}`);
-			}
-		}
+      // Check if the entity is included and/or excluded
+      //
+      if (
+        excludedEntities.indexOf(`${schemaName}.${tableName}`) === -1 &&
+        (includedEntities.length === 0 ||
+          includedEntities.indexOf(`${schemaName}.${tableName}`) !== -1)
+      ) {
+        console.warn(`Processing table ${schemaName}/${tableName}`);
+        convertEntity({
+          project,
+          strict,
+          defaultDescription,
+          outputFolder,
+          schemaName,
+          entity: table,
+          sharedTypesFile,
+        });
+      } else {
+        console.warn(`Skipping excluded table ${tableName}`);
+      }
+    }
 
-		// Process all the views in the schema
-		//
-		for (const view of schema.views) {
-			const viewName = view.name;
+    // Process all the views in the schema
+    //
+    for (const view of schema.views) {
+      const viewName = view.name;
 
-			// Check if the entity is included and/or excluded
-			//
-			if (
-				excludedEntities.indexOf(`${schemaName}.${viewName}`) === -1 &&
-				(includedEntities.length === 0 ||
-					includedEntities.indexOf(`${schemaName}.${viewName}`) !== -1)
-			) {
-				console.warn(`Processing view ${schemaName}/${viewName}`);
-				convertEntity({
-					project,
-					strict,
-					defaultDescription,
-					outputFolder,
-					schemaName,
-					entity: view,
-					sharedTypesFile,
-				});
-			}
-		}
+      // Check if the entity is included and/or excluded
+      //
+      if (
+        excludedEntities.indexOf(`${schemaName}.${viewName}`) === -1 &&
+        (includedEntities.length === 0 ||
+          includedEntities.indexOf(`${schemaName}.${viewName}`) !== -1)
+      ) {
+        console.warn(`Processing view ${schemaName}/${viewName}`);
+        convertEntity({
+          project,
+          strict,
+          defaultDescription,
+          outputFolder,
+          schemaName,
+          entity: view,
+          sharedTypesFile,
+        });
+      }
+    }
 
-		// Process all the materialized views in the schema
-		//
-		for (const view of schema.materializedViews) {
-			const viewName = view.name;
+    // Process all the materialized views in the schema
+    //
+    for (const view of schema.materializedViews) {
+      const viewName = view.name;
 
-			// Check if the entity is included and/or excluded
-			//
-			if (
-				excludedEntities.indexOf(`${schemaName}.${viewName}`) === -1 &&
-				(includedEntities.length === 0 ||
-					includedEntities.indexOf(`${schemaName}.${viewName}`) !== -1)
-			) {
-				console.warn(`Processing materialized view ${schemaName}/${viewName}`);
-				convertEntity({
-					project,
-					strict,
-					defaultDescription,
-					outputFolder,
-					schemaName,
-					entity: view,
-					sharedTypesFile,
-				});
-			}
-		}
-	}
+      // Check if the entity is included and/or excluded
+      //
+      if (
+        excludedEntities.indexOf(`${schemaName}.${viewName}`) === -1 &&
+        (includedEntities.length === 0 ||
+          includedEntities.indexOf(`${schemaName}.${viewName}`) !== -1)
+      ) {
+        console.warn(`Processing materialized view ${schemaName}/${viewName}`);
+        convertEntity({
+          project,
+          strict,
+          defaultDescription,
+          outputFolder,
+          schemaName,
+          entity: view,
+          sharedTypesFile,
+        });
+      }
+    }
+  }
 
-	// Saving to disk if an output folder is specified in the configuration options
-	//
-	const files = project.getSourceFiles();
-	if (configuration.output?.outDir) {
-		console.warn(`Outputting files to ${outputFolder}`);
-		await project.save();
-	}
-	return files.map((file) => ({
-		path: file.getFilePath(),
-		schema: file.getFullText(),
-	}));
+  // Saving to disk if an output folder is specified in the configuration options
+  //
+  const files = project.getSourceFiles();
+  if (configuration.output?.outDir) {
+    console.warn(`Outputting files to ${outputFolder}`);
+    await project.save();
+  }
+  return files.map((file) => ({
+    path: file.getFilePath(),
+    schema: file.getFullText(),
+  }));
 }
