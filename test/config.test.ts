@@ -45,7 +45,6 @@ test('invalid configuration should fail', () => {
 	try {
 		const invalidConfig = structuredClone(exampleConfig);
 		invalidConfig.pg.port = -1;
-		// biome-ignore lint/suspicious/noExplicitAny: needed for test to fail
 		(invalidConfig.pg.database as any) = false;
 		const parsedConfig = configurationSchema.parse(invalidConfig);
 		expect(parsedConfig).toBeUndefined();

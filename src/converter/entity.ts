@@ -1,11 +1,7 @@
 import { join } from 'node:path';
 import { camelCase, upperFirst } from 'lodash-es';
 import type { Entity } from 'pg-structure';
-import {
-	type Project,
-	type SourceFile,
-	VariableDeclarationKind,
-} from 'ts-morph';
+import { type Project, type SourceFile, VariableDeclarationKind } from 'ts-morph';
 import { convertColumn } from './column.js';
 import escapeSingleQuotes from './escape-single-quotes.js';
 
@@ -50,14 +46,10 @@ export function convertEntity({
 	// Check if any of the columns are using the PostgresqlInterval type
 	// If so, import it from the shared types file
 	//
-	const usesPostgresqlInterval = columns.some(
-		(column) => column.type.name === 'interval',
-	);
+	const usesPostgresqlInterval = columns.some((column) => column.type.name === 'interval');
 	if (usesPostgresqlInterval) {
 		sourceFile.addImportDeclaration({
-			moduleSpecifier: sourceFile
-				.getRelativePathTo(sharedTypesFile)
-				.replace(/\.ts$/, '.js'),
+			moduleSpecifier: sourceFile.getRelativePathTo(sharedTypesFile).replace(/\.ts$/, '.js'),
 			namedImports: ['PostgresqlIntervalSchema'],
 		});
 	}

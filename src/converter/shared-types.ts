@@ -1,11 +1,7 @@
 import { join } from 'node:path';
 import { camelCase, upperFirst } from 'lodash-es';
 import type { EnumType } from 'pg-structure';
-import {
-	type Project,
-	type SourceFile,
-	VariableDeclarationKind,
-} from 'ts-morph';
+import { type Project, type SourceFile, VariableDeclarationKind } from 'ts-morph';
 import escapeSingleQuotes from './escape-single-quotes';
 
 export function addSharedTypesFile({
@@ -107,14 +103,14 @@ export function addEnum({
 
 	// Only add the enum if it doesn't already exist in the shared types file
 	//
-	if (
-		!existingVariables.some((variable) => variable.getName() === schemaName)
-	) {
+	if (!existingVariables.some((variable) => variable.getName() === schemaName)) {
 		const values = enumType.values;
 		const isNumeric = !!enumType.numericType;
 		let enumInitializer = isNumeric
-			? `z.literal([${Array.from(values.keys()).map((value) => `'${value}'`)}])`
-			: `z.enum([${values.map((value) => `'${value}'`)}])`;
+			? `z.literal([${Array.from(values.keys())
+					.map((value) => `'${value}'`)
+					.join(',')}])`
+			: `z.enum([${values.map((value) => `'${value}'`).join(',')}])`;
 		if (description) {
 			enumInitializer += `.describe(\`${escapeSingleQuotes(description)}\`)`;
 		}
@@ -144,15 +140,11 @@ export function addEnum({
 	const existingImports = sourceFile.getImportDeclarations();
 	const isAlreadyImported = existingImports.some((importDecl) => {
 		const namedImports = importDecl.getNamedImports();
-		return namedImports.some(
-			(namedImport) => namedImport.getName() === schemaName,
-		);
+		return namedImports.some((namedImport) => namedImport.getName() === schemaName);
 	});
 	if (!isAlreadyImported) {
 		sourceFile.addImportDeclaration({
-			moduleSpecifier: sourceFile
-				.getRelativePathTo(sharedTypesFile)
-				.replace(/\.ts$/, '.js'),
+			moduleSpecifier: sourceFile.getRelativePathTo(sharedTypesFile).replace(/\.ts$/, '.js'),
 			namedImports: [schemaName],
 		});
 	}

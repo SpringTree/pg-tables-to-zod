@@ -22,8 +22,7 @@ export function convertColumn({
 	const columnName = column.name;
 	const columnType = column.type.name;
 	const isArray = column.arrayDimension > 0;
-	const enumType =
-		column.type instanceof EnumType ? (column.type as EnumType) : undefined;
+	const enumType = column.type instanceof EnumType ? (column.type as EnumType) : undefined;
 	let description = `${escapeSingleQuotes(column.comment) || defaultDescription || `No description available for column ${columnName}`}. Database type: ${columnType}. Default value: ${escapeSingleQuotes(column.default)}`;
 	if (enumType) {
 		const values = enumType.values;
@@ -124,9 +123,7 @@ export function convertColumn({
 						description: enumType.comment,
 					});
 				} else {
-					console.warn(
-						`Unsupported column type: ${columnType}. Defaulting to any`,
-					);
+					console.warn(`Unsupported column type: ${columnType}. Defaulting to any`);
 					typeSchema = `z.any()`;
 				}
 			}

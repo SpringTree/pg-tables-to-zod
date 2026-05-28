@@ -62,10 +62,10 @@ bun run src/cli.ts -c my-config.json
 
 ### :cool: Technology stack
 
-* bun
-* typescript
-* zod
-* pg-structure
+- bun
+- typescript
+- zod
+- pg-structure
 
 ### :twisted_rightwards_arrows: Branch strategy and protection
 

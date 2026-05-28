@@ -9,15 +9,11 @@ const inputConfigurationSchema = z
 		include: z
 			.array(z.string())
 			.optional()
-			.describe(
-				'List of structure objects to include in the conversion. Defaults to all found.',
-			),
+			.describe('List of structure objects to include in the conversion. Defaults to all found.'),
 		exclude: z
 			.array(z.string())
 			.optional()
-			.describe(
-				'List of structure objects to exclude in the conversion. Defaults to none.',
-			),
+			.describe('List of structure objects to exclude in the conversion. Defaults to none.'),
 	})
 	.strict()
 	.describe('Database setting configuration');

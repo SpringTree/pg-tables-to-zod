@@ -18,10 +18,7 @@ program
 		'Path to configuration file. Additional parameters override config values',
 	)
 	.option('--pg-host <value>', 'The postgresql host to connect to')
-	.option(
-		'--pg-port <n>',
-		'The postgresql host to connect to. Defaults to 5432',
-	)
+	.option('--pg-port <n>', 'The postgresql host to connect to. Defaults to 5432')
 	.option('--pg-database <value>', 'The postgresql database to connect to')
 	.option('--pg-user <value>', 'The postgresql user to login with')
 	.option('--pg-password <value>', 'The postgresql password to login with')
@@ -30,10 +27,7 @@ program
 		'-o, --out [file]',
 		'Output folder. Default output is to STDOUT. A sub-folder will be created per schema',
 	)
-	.option(
-		'-s, --strict <value>',
-		'Allow additional properties on final schema. Default: true',
-	)
+	.option('-s, --strict <value>', 'Allow additional properties on final schema. Default: true')
 	.option(
 		'-t, --include-tables <value>',
 		'Comma separated list of tables to process. Default is all tables found',
@@ -142,14 +136,10 @@ try {
 			console.log(JSON.stringify(outputSchemas, null, 2));
 		}
 	} else {
-		console.log(
-			`Conversion completed successfully. Files are saved in ${outputFolder}`,
-		);
+		console.log(`Conversion completed successfully. Files are saved in ${outputFolder}`);
 	}
 } catch (error) {
-	console.error(`Conversion failed: ${error}`);
-	console.error(
-		'Suggestion: Run with --help for parameters or check supplied configuration',
-	);
+	console.error(`Conversion failed: ${error as Error}`);
+	console.error('Suggestion: Run with --help for parameters or check supplied configuration');
 	process.exit(-1);
 }

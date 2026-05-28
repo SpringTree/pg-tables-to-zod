@@ -15,9 +15,7 @@ export interface IOutputZodSchema {
 // Using console.warn on purpose here so that output to stdout can be captured
 // without logging information messages
 //
-export async function convert(
-	configuration: TConfiguration,
-): Promise<IOutputZodSchema[]> {
+export async function convert(configuration: TConfiguration): Promise<IOutputZodSchema[]> {
 	checkConfiguration(configuration);
 
 	console.warn('Connecting to database...');
