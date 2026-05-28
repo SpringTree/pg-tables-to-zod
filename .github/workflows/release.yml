@@ -47,5 +47,5 @@ jobs:
 
       - name: Publish to npm
         run: bunx npm publish --provenance
-				env:
-  				NPM_CONFIG_PROVENANCE: true
+		env:
+			NPM_CONFIG_PROVENANCE: true
