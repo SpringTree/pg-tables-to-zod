@@ -116,7 +116,7 @@ export function addEnum({
 			? `z.literal([${Array.from(values.keys()).map((value) => `'${value}'`)}])`
 			: `z.enum([${values.map((value) => `'${value}'`)}])`;
 		if (description) {
-			enumInitializer += `.describe('${escapeSingleQuotes(description)}')`;
+			enumInitializer += `.describe(\`${escapeSingleQuotes(description)}\`)`;
 		}
 
 		// Add: export const PostgresqlIntervalSchema = ...

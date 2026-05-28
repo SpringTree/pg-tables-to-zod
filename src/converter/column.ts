@@ -140,7 +140,7 @@ export function convertColumn({
 		typeSchema += `.max(${column.length})`;
 	}
 	if (defaultDescription) {
-		typeSchema += `.describe('${description}')`;
+		typeSchema += `.describe(\`${description}\`)`;
 	}
 
 	// If the column is nullable or has a default value, make it optional

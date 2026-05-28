@@ -80,7 +80,7 @@ export function convertEntity({
 	.${strict ? 'strictObject' : 'object'}({
 		${columnSchemaCode.join(',\n		')}
 	})
-	.describe('${escapeSingleQuotes(entity.comment || defaultDescription || `No description available for ${entity.name}`)}')`;
+	.describe(\`${escapeSingleQuotes(entity.comment || defaultDescription || `No description available for ${entity.name}`)}\`)`;
 
 	sourceFile.addVariableStatement({
 		declarationKind: VariableDeclarationKind.Const,
