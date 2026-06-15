@@ -74,8 +74,8 @@ All changes need to be done through a reviewed pull request.
 
 ## :up: Deploying
 
-The package is npm automatically when a new version tag is added.
-This can be done using the `bun run release` script before pushing to main.
+Package is published to NPM using trusted publishing from the GitHub action called release.
+The version bump can be done by running `bun run release`
 
 ## Contributing
 
