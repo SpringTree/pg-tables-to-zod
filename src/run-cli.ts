@@ -104,7 +104,9 @@ export async function runCli(cliArguments: string[]): Promise<number> {
       const configFromFile = await readConfigFile(options.config);
       configuration = mergeConfigurations(configFromFile, cliConfiguration);
     } catch (error) {
-      console.error(`Failed to read configuration file at ${options.config}:`, error);
+      // The path is an argument, not part of the format string, so a % in it is printed as is
+      //
+      console.error("Failed to read configuration file at %s:", options.config, error);
       return 1;
     }
   }

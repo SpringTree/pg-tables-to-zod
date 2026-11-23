@@ -191,12 +191,13 @@ test("fail running when an option is unknown", async () => {
 });
 
 test("fail running when the configuration file cannot be read", async () => {
-  const missingPath = join(temporaryFolder, "missing.json");
+  const missingPath = join(temporaryFolder, "missing-%s.json");
 
   expect(await runCli(["--config", missingPath])).toBe(1);
-  expect(consoleErrorSpy.mock.calls[0]?.[0]).toBe(
-    `Failed to read configuration file at ${missingPath}:`,
-  );
+  expect(consoleErrorSpy.mock.calls[0]?.slice(0, 2)).toEqual([
+    "Failed to read configuration file at %s:",
+    missingPath,
+  ]);
 });
 
 test("fail running when the removed unwrap option is given", async () => {
