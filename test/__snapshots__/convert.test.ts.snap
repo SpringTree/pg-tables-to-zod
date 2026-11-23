@@ -30,6 +30,10 @@ export const PostgresqlIntervalSchema = z.union([
 
 export type TPostgresqlInterval = z.infer<typeof PostgresqlIntervalSchema>;
 
+export const QuoteStyleSchema = z.enum(['it\\'s','back\\\\\\\\slash','tick\`','\${placeholder}']).describe(\`Enum with \\\`backticks\\\`, \\\${braces} and a \\\\ backslash\`);
+
+export type EQuoteStyle = z.infer<typeof QuoteStyleSchema>;
+
 export const OrderStatusSchema = z.enum(['new','paid','shipped']).describe(\`Status of an order\`);
 
 export type EOrderStatus = z.infer<typeof OrderStatusSchema>;
@@ -65,7 +69,7 @@ export default auditEntrySchema;
 const customerAccountSchema = z
     	.strictObject({
     		id: z.uuid().describe(\`Fixture. Database type: uuid. Default value: \`),
-    		email: z.string().max(120).describe(\`The customer\\'s e-mail. Database type: character varying. Default value: \`),
+    		email: z.string().max(120).describe(\`The customer's e-mail. Database type: character varying. Default value: \`),
     		country_code: z.string().max(2).describe(\`Fixture. Database type: character. Default value: \`),
     		display_name: z.string().describe(\`Fixture. Database type: text. Default value: \`).optional(),
     		avatar: z.string().describe(\`Fixture. Database type: bytea. Default value: \`).optional(),
@@ -83,17 +87,38 @@ const customerAccountSchema = z
     		wakes_at_tz: z.iso.time().describe(\`Fixture. Database type: time with time zone. Default value: \`).optional(),
     		created_at: z.iso.datetime().describe(\`Fixture. Database type: timestamp with time zone. Default value: now()\`).optional(),
     		updated_at: z.iso.datetime().describe(\`Fixture. Database type: timestamp without time zone. Default value: \`).optional(),
-    		preferences: z.json().describe(\`Fixture. Database type: jsonb. Default value: \\'{}\\'\`).optional(),
+    		preferences: z.json().describe(\`Fixture. Database type: jsonb. Default value: '{}'\`).optional(),
     		raw_preferences: z.json().describe(\`Fixture. Database type: json. Default value: \`).optional(),
     		tags: z.array(z.string()).describe(\`Fixture. Database type: text. Default value: \`).optional(),
     		lucky_numbers: z.array(z.int()).describe(\`Fixture. Database type: integer. Default value: \`).optional(),
     		ip_address: z.any().describe(\`Fixture. Database type: inet. Default value: \`).optional()
     	})
-    	.describe(\`A customer\\'s account\`);
+    	.describe(\`A customer's account\`);
 
 export type TCustomerAccount = z.infer<typeof customerAccountSchema>;
 
 export default customerAccountSchema;
+"
+,
+  },
+  {
+    "path": "public/escape_check.ts",
+    "schema": 
+"import { z } from "zod";
+import { QuoteStyleSchema } from "../pg-types.js";
+
+const escapeCheckSchema = z
+    	.strictObject({
+    		id: z.int().describe(\`Fixture. Database type: integer. Default value: \`),
+    		style: QuoteStyleSchema.describe(\`Fixture. Database type: quote_style. Default value:  Enumeration values: it's, back\\\\\\\\slash, tick\\\`, \\\${placeholder}\`).optional(),
+    		note: z.string().describe(\`Two
+lines with \\\`tick\\\`, \\\${braces} and \\\\u0041. Database type: text. Default value: 'it''s \\\`x\\\` \\\${y} \\\\u0041'\`).optional()
+    	})
+    	.describe(\`Table with \\\`backticks\\\`, \\\${braces}, a \\\\ backslash and it's quoted\`);
+
+export type TEscapeCheck = z.infer<typeof escapeCheckSchema>;
+
+export default escapeCheckSchema;
 "
 ,
   },

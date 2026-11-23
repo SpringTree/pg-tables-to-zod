@@ -3,7 +3,7 @@ import { camelCase, upperFirst } from "./camel-case.js";
 import type { Entity } from "pg-structure";
 import { type Project, type SourceFile, VariableDeclarationKind } from "ts-morph";
 import { convertColumn } from "./column.js";
-import escapeSingleQuotes from "./escape-single-quotes.js";
+import { escapeTemplateLiteral } from "./escape.js";
 
 // Helper method to convert a postgresql table to a Zod schema
 // Which will be added to the ts-morph project to be output either
@@ -72,7 +72,7 @@ export function convertEntity({
 	.${strict ? "strictObject" : "object"}({
 		${columnSchemaCode.join(",\n		")}
 	})
-	.describe(\`${escapeSingleQuotes(entity.comment || defaultDescription || `No description available for ${entity.name}`)}\`)`;
+	.describe(\`${escapeTemplateLiteral(entity.comment || defaultDescription || `No description available for ${entity.name}`)}\`)`;
 
   sourceFile.addVariableStatement({
     declarationKind: VariableDeclarationKind.Const,

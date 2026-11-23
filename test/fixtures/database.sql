@@ -49,6 +49,21 @@ CREATE TABLE public.audit_entry (
   id integer NOT NULL
 );
 
+-- Comments, defaults and enum values with characters that need escaping in the generated code:
+-- quotes, backticks, template placeholders, backslashes and line breaks.
+-- Known pg-structure 7.15 limitation: its enum value parser drops a value with a line break
+-- and doubles a backslash, so the generated enum differs from the database for those two values
+CREATE TYPE public.quote_style AS ENUM ('it''s', 'back\slash', 'tick`', '${placeholder}', E'line\nbreak');
+COMMENT ON TYPE public.quote_style IS 'Enum with `backticks`, ${braces} and a \ backslash';
+
+CREATE TABLE public.escape_check (
+  id integer NOT NULL,
+  style quote_style,
+  note text DEFAULT 'it''s `x` ${y} \u0041'
+);
+COMMENT ON TABLE public.escape_check IS 'Table with `backticks`, ${braces}, a \ backslash and it''s quoted';
+COMMENT ON COLUMN public.escape_check.note IS E'Two\nlines with `tick`, ${braces} and \\u0041';
+
 CREATE TABLE shop.sales_order (
   id integer PRIMARY KEY,
   status public.order_status NOT NULL,

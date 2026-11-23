@@ -2,7 +2,7 @@ import { join } from "node:path";
 import { camelCase, upperFirst } from "./camel-case.js";
 import type { EnumType } from "pg-structure";
 import { type Project, type SourceFile, VariableDeclarationKind } from "ts-morph";
-import escapeSingleQuotes from "./escape-single-quotes";
+import { escapeSingleQuotedString, escapeTemplateLiteral } from "./escape.js";
 
 export function addSharedTypesFile({
   project,
@@ -110,9 +110,9 @@ export function addEnum({
       ? `z.literal([${Array.from(values.keys())
           .map((value) => `'${value}'`)
           .join(",")}])`
-      : `z.enum([${values.map((value) => `'${value}'`).join(",")}])`;
+      : `z.enum([${values.map((value) => `'${escapeSingleQuotedString(value)}'`).join(",")}])`;
     if (description) {
-      enumInitializer += `.describe(\`${escapeSingleQuotes(description)}\`)`;
+      enumInitializer += `.describe(\`${escapeTemplateLiteral(description)}\`)`;
     }
 
     // Add: export const PostgresqlIntervalSchema = ...

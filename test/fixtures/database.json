@@ -10,8 +10,8 @@
   },
   "queryResults": [
     [
-      { "oid": 16426, "name": "public", "comment": null },
-      { "oid": 16427, "name": "shop", "comment": null }
+      { "oid": 16473, "name": "public", "comment": null },
+      { "oid": 16474, "name": "shop", "comment": null }
     ],
     [{ "oid": 11, "name": "pg_catalog", "comment": "system catalog schema" }],
     [
@@ -3968,10 +3968,10 @@
         "relationKind": null
       },
       {
-        "oid": 16457,
-        "arrayOid": 16456,
-        "schemaOid": 16426,
-        "classOid": 16455,
+        "oid": 16505,
+        "arrayOid": 16504,
+        "schemaOid": 16473,
+        "classOid": 16503,
         "kind": "c",
         "category": "C",
         "notNull": false,
@@ -3984,10 +3984,10 @@
         "relationKind": "r"
       },
       {
-        "oid": 16443,
-        "arrayOid": 16442,
-        "schemaOid": 16426,
-        "classOid": 16441,
+        "oid": 16491,
+        "arrayOid": 16490,
+        "schemaOid": 16473,
+        "classOid": 16489,
         "kind": "c",
         "category": "C",
         "notNull": false,
@@ -4000,10 +4000,26 @@
         "relationKind": "r"
       },
       {
-        "oid": 16454,
-        "arrayOid": 16453,
-        "schemaOid": 16426,
-        "classOid": 16452,
+        "oid": 16519,
+        "arrayOid": 16518,
+        "schemaOid": 16473,
+        "classOid": 16517,
+        "kind": "c",
+        "category": "C",
+        "notNull": false,
+        "default": null,
+        "sqlType": null,
+        "arrayDimension": 0,
+        "name": "escape_check",
+        "values": "{}",
+        "comment": null,
+        "relationKind": "r"
+      },
+      {
+        "oid": 16502,
+        "arrayOid": 16501,
+        "schemaOid": 16473,
+        "classOid": 16500,
         "kind": "c",
         "category": "C",
         "notNull": false,
@@ -4016,9 +4032,9 @@
         "relationKind": "r"
       },
       {
-        "oid": 16429,
-        "arrayOid": 16428,
-        "schemaOid": 16426,
+        "oid": 16476,
+        "arrayOid": 16475,
+        "schemaOid": 16473,
         "classOid": 0,
         "kind": "e",
         "category": "E",
@@ -4032,9 +4048,9 @@
         "relationKind": null
       },
       {
-        "oid": 16436,
-        "arrayOid": 16435,
-        "schemaOid": 16426,
+        "oid": 16484,
+        "arrayOid": 16483,
+        "schemaOid": 16473,
         "classOid": 0,
         "kind": "e",
         "category": "E",
@@ -4048,10 +4064,26 @@
         "relationKind": null
       },
       {
-        "oid": 16471,
-        "arrayOid": 16470,
-        "schemaOid": 16427,
-        "classOid": 16469,
+        "oid": 16507,
+        "arrayOid": 16506,
+        "schemaOid": 16473,
+        "classOid": 0,
+        "kind": "e",
+        "category": "E",
+        "notNull": false,
+        "default": null,
+        "sqlType": null,
+        "arrayDimension": 0,
+        "name": "quote_style",
+        "values": "{it's,\"back\\\\slash\",tick`,\"${placeholder}\",\"line\nbreak\"}",
+        "comment": "Enum with `backticks`, ${braces} and a \\ backslash",
+        "relationKind": null
+      },
+      {
+        "oid": 16536,
+        "arrayOid": 16535,
+        "schemaOid": 16474,
+        "classOid": 16534,
         "kind": "c",
         "category": "C",
         "notNull": false,
@@ -4064,10 +4096,10 @@
         "relationKind": "m"
       },
       {
-        "oid": 16467,
-        "arrayOid": 16466,
-        "schemaOid": 16427,
-        "classOid": 16465,
+        "oid": 16532,
+        "arrayOid": 16531,
+        "schemaOid": 16474,
+        "classOid": 16530,
         "kind": "c",
         "category": "C",
         "notNull": false,
@@ -4080,10 +4112,10 @@
         "relationKind": "v"
       },
       {
-        "oid": 16460,
-        "arrayOid": 16459,
-        "schemaOid": 16427,
-        "classOid": 16458,
+        "oid": 16525,
+        "arrayOid": 16524,
+        "schemaOid": 16474,
+        "classOid": 16523,
         "kind": "c",
         "category": "C",
         "notNull": false,
@@ -4097,20 +4129,27 @@
       }
     ],
     [
-      { "oid": 16455, "schemaOid": 16426, "kind": "r", "name": "audit_entry", "comment": null },
+      { "oid": 16503, "schemaOid": 16473, "kind": "r", "name": "audit_entry", "comment": null },
       {
-        "oid": 16441,
-        "schemaOid": 16426,
+        "oid": 16489,
+        "schemaOid": 16473,
         "kind": "r",
         "name": "customer_account",
         "comment": "A customer's account"
       },
-      { "oid": 16452, "schemaOid": 16426, "kind": "r", "name": "HTTPRequestLog", "comment": null },
-      { "oid": 16469, "schemaOid": 16427, "kind": "m", "name": "order_totals", "comment": null },
-      { "oid": 16465, "schemaOid": 16427, "kind": "v", "name": "paid_orders", "comment": null },
       {
-        "oid": 16458,
-        "schemaOid": 16427,
+        "oid": 16517,
+        "schemaOid": 16473,
+        "kind": "r",
+        "name": "escape_check",
+        "comment": "Table with `backticks`, ${braces}, a \\ backslash and it's quoted"
+      },
+      { "oid": 16500, "schemaOid": 16473, "kind": "r", "name": "HTTPRequestLog", "comment": null },
+      { "oid": 16534, "schemaOid": 16474, "kind": "m", "name": "order_totals", "comment": null },
+      { "oid": 16530, "schemaOid": 16474, "kind": "v", "name": "paid_orders", "comment": null },
+      {
+        "oid": 16523,
+        "schemaOid": 16474,
         "kind": "r",
         "name": "sales_order",
         "comment": "An order placed in the shop"
@@ -4118,7 +4157,7 @@
     ],
     [
       {
-        "parentOid": 16455,
+        "parentOid": 16503,
         "typeOid": 23,
         "attributeNumber": 1,
         "parentKind": "r",
@@ -4132,7 +4171,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 2950,
         "attributeNumber": 1,
         "parentKind": "r",
@@ -4146,7 +4185,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 1043,
         "attributeNumber": 2,
         "parentKind": "r",
@@ -4160,7 +4199,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 1042,
         "attributeNumber": 3,
         "parentKind": "r",
@@ -4174,7 +4213,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 25,
         "attributeNumber": 4,
         "parentKind": "r",
@@ -4188,7 +4227,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 17,
         "attributeNumber": 5,
         "parentKind": "r",
@@ -4202,7 +4241,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 1560,
         "attributeNumber": 6,
         "parentKind": "r",
@@ -4216,7 +4255,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 1562,
         "attributeNumber": 7,
         "parentKind": "r",
@@ -4230,7 +4269,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 16,
         "attributeNumber": 8,
         "parentKind": "r",
@@ -4244,7 +4283,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 23,
         "attributeNumber": 9,
         "parentKind": "r",
@@ -4258,7 +4297,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 20,
         "attributeNumber": 10,
         "parentKind": "r",
@@ -4272,7 +4311,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 1700,
         "attributeNumber": 11,
         "parentKind": "r",
@@ -4286,7 +4325,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 701,
         "attributeNumber": 12,
         "parentKind": "r",
@@ -4300,7 +4339,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 700,
         "attributeNumber": 13,
         "parentKind": "r",
@@ -4314,7 +4353,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 21,
         "attributeNumber": 14,
         "parentKind": "r",
@@ -4328,7 +4367,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 1082,
         "attributeNumber": 15,
         "parentKind": "r",
@@ -4342,7 +4381,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 1083,
         "attributeNumber": 16,
         "parentKind": "r",
@@ -4356,7 +4395,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 1266,
         "attributeNumber": 17,
         "parentKind": "r",
@@ -4370,7 +4409,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 1184,
         "attributeNumber": 18,
         "parentKind": "r",
@@ -4384,7 +4423,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 1114,
         "attributeNumber": 19,
         "parentKind": "r",
@@ -4398,7 +4437,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 3802,
         "attributeNumber": 20,
         "parentKind": "r",
@@ -4412,7 +4451,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 114,
         "attributeNumber": 21,
         "parentKind": "r",
@@ -4426,7 +4465,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 1009,
         "attributeNumber": 22,
         "parentKind": "r",
@@ -4440,7 +4479,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 1007,
         "attributeNumber": 23,
         "parentKind": "r",
@@ -4454,7 +4493,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16441,
+        "parentOid": 16489,
         "typeOid": 869,
         "attributeNumber": 24,
         "parentKind": "r",
@@ -4468,7 +4507,49 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16452,
+        "parentOid": 16517,
+        "typeOid": 23,
+        "attributeNumber": 1,
+        "parentKind": "r",
+        "name": "id",
+        "defaultWithTypeCast": null,
+        "notNull": true,
+        "sqlType": "integer",
+        "arrayDimension": 0,
+        "position": 1,
+        "comment": null,
+        "isGenerated": false
+      },
+      {
+        "parentOid": 16517,
+        "typeOid": 16507,
+        "attributeNumber": 2,
+        "parentKind": "r",
+        "name": "style",
+        "defaultWithTypeCast": null,
+        "notNull": false,
+        "sqlType": "quote_style",
+        "arrayDimension": 0,
+        "position": 2,
+        "comment": null,
+        "isGenerated": false
+      },
+      {
+        "parentOid": 16517,
+        "typeOid": 25,
+        "attributeNumber": 3,
+        "parentKind": "r",
+        "name": "note",
+        "defaultWithTypeCast": "'it''s `x` ${y} \\u0041'::text",
+        "notNull": false,
+        "sqlType": "text",
+        "arrayDimension": 0,
+        "position": 3,
+        "comment": "Two\nlines with `tick`, ${braces} and \\u0041",
+        "isGenerated": false
+      },
+      {
+        "parentOid": 16500,
         "typeOid": 20,
         "attributeNumber": 1,
         "parentKind": "r",
@@ -4482,7 +4563,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16452,
+        "parentOid": 16500,
         "typeOid": 1186,
         "attributeNumber": 2,
         "parentKind": "r",
@@ -4496,8 +4577,8 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16452,
-        "typeOid": 16429,
+        "parentOid": 16500,
+        "typeOid": 16476,
         "attributeNumber": 3,
         "parentKind": "r",
         "name": "status",
@@ -4510,8 +4591,8 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16452,
-        "typeOid": 16436,
+        "parentOid": 16500,
+        "typeOid": 16484,
         "attributeNumber": 4,
         "parentKind": "r",
         "name": "urgency",
@@ -4524,8 +4605,8 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16469,
-        "typeOid": 16429,
+        "parentOid": 16534,
+        "typeOid": 16476,
         "attributeNumber": 1,
         "parentKind": "m",
         "name": "status",
@@ -4538,7 +4619,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16469,
+        "parentOid": 16534,
         "typeOid": 20,
         "attributeNumber": 2,
         "parentKind": "m",
@@ -4552,7 +4633,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16465,
+        "parentOid": 16530,
         "typeOid": 23,
         "attributeNumber": 1,
         "parentKind": "v",
@@ -4566,8 +4647,8 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16465,
-        "typeOid": 16429,
+        "parentOid": 16530,
+        "typeOid": 16476,
         "attributeNumber": 2,
         "parentKind": "v",
         "name": "status",
@@ -4580,7 +4661,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16458,
+        "parentOid": 16523,
         "typeOid": 23,
         "attributeNumber": 1,
         "parentKind": "r",
@@ -4594,8 +4675,8 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16458,
-        "typeOid": 16429,
+        "parentOid": 16523,
+        "typeOid": 16476,
         "attributeNumber": 2,
         "parentKind": "r",
         "name": "status",
@@ -4608,8 +4689,8 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16458,
-        "typeOid": 16428,
+        "parentOid": 16523,
+        "typeOid": 16475,
         "attributeNumber": 3,
         "parentKind": "r",
         "name": "history",
@@ -4622,7 +4703,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16458,
+        "parentOid": 16523,
         "typeOid": 1186,
         "attributeNumber": 4,
         "parentKind": "r",
@@ -4636,7 +4717,7 @@
         "isGenerated": false
       },
       {
-        "parentOid": 16458,
+        "parentOid": 16523,
         "typeOid": 114,
         "attributeNumber": 5,
         "parentKind": "r",
@@ -4652,8 +4733,8 @@
     ],
     [
       {
-        "oid": 16450,
-        "tableOid": 16441,
+        "oid": 16498,
+        "tableOid": 16489,
         "name": "customer_account_pkey",
         "isUnique": true,
         "isPrimaryKey": true,
@@ -4664,8 +4745,8 @@
         "comment": null
       },
       {
-        "oid": 16463,
-        "tableOid": 16458,
+        "oid": 16528,
+        "tableOid": 16523,
         "name": "sales_order_pkey",
         "isUnique": true,
         "isPrimaryKey": true,
@@ -4678,8 +4759,8 @@
     ],
     [
       {
-        "tableOid": 16441,
-        "indexOid": 16450,
+        "tableOid": 16489,
+        "indexOid": 16498,
         "typeOid": 0,
         "kind": "p",
         "name": "customer_account_pkey",
@@ -4694,8 +4775,8 @@
         "comment": null
       },
       {
-        "tableOid": 16458,
-        "indexOid": 16463,
+        "tableOid": 16523,
+        "indexOid": 16528,
         "typeOid": 0,
         "kind": "p",
         "name": "sales_order_pkey",

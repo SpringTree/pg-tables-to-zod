@@ -1,6 +1,6 @@
 import { type Column, EnumType } from "pg-structure";
 import type { SourceFile } from "ts-morph";
-import escapeSingleQuotes from "./escape-single-quotes.js";
+import { escapeTemplateLiteral } from "./escape.js";
 import { addEnum } from "./shared-types.js";
 
 /**
@@ -23,7 +23,7 @@ export function convertColumn({
   const columnType = column.type.name;
   const isArray = column.arrayDimension > 0;
   const enumType = column.type instanceof EnumType ? (column.type as EnumType) : undefined;
-  let description = `${escapeSingleQuotes(column.comment) || defaultDescription || `No description available for column ${columnName}`}. Database type: ${columnType}. Default value: ${escapeSingleQuotes(column.default)}`;
+  let description = `${column.comment || defaultDescription || `No description available for column ${columnName}`}. Database type: ${columnType}. Default value: ${column.default ?? ""}`;
   if (enumType) {
     const values = enumType.values;
     description += ` Enumeration values: ${values.join(", ")}`;
@@ -137,7 +137,7 @@ export function convertColumn({
     typeSchema += `.max(${column.length})`;
   }
   if (defaultDescription) {
-    typeSchema += `.describe(\`${description}\`)`;
+    typeSchema += `.describe(\`${escapeTemplateLiteral(description)}\`)`;
   }
 
   // If the column is nullable or has a default value, make it optional

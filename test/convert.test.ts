@@ -1,8 +1,10 @@
 import { afterAll, beforeEach, expect, spyOn, test } from "bun:test";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
-import { connectToDatabase } from "./helpers/fixture-database";
+import type { EnumType } from "pg-structure";
+import type { z } from "zod";
+import { connectToDatabase, fixtureDatabase } from "./helpers/fixture-database";
 import { convert, type TConfiguration } from "../src";
 
 const pgConfiguration: TConfiguration["pg"] = {
@@ -53,6 +55,7 @@ test("successfully convert all tables, views and materialized views", async () =
     "pg-types.ts",
     "public/audit_entry.ts",
     "public/customer_account.ts",
+    "public/escape_check.ts",
     "public/HTTPRequestLog.ts",
     "shop/order_totals.ts",
     "shop/paid_orders.ts",
@@ -85,6 +88,7 @@ test("successfully convert the public schema when no schemas are configured", as
     "pg-types.ts",
     "public/audit_entry.ts",
     "public/customer_account.ts",
+    "public/escape_check.ts",
     "public/HTTPRequestLog.ts",
   ]);
 });
@@ -137,6 +141,7 @@ test("successfully skip the excluded entities", async () => {
   expect(outputSchemas.map((outputSchema) => outputSchema.path)).toEqual([
     "pg-types.ts",
     "public/audit_entry.ts",
+    "public/escape_check.ts",
     "public/HTTPRequestLog.ts",
     "shop/sales_order.ts",
   ]);
@@ -167,6 +172,39 @@ test("successfully write the schema files when an output folder is configured", 
     const fileContents = await readFile(join(outputFolder, outputSchema.path), "utf8");
     expect(fileContents).toBe(outputSchema.schema);
   }
+});
+
+test("successfully keep comments, defaults and enum values intact when they contain characters that need escaping", async () => {
+  // Written below node_modules so the generated files can import zod
+  //
+  const cacheFolder = join(import.meta.dir, "../node_modules/.cache");
+  await mkdir(cacheFolder, { recursive: true });
+  const outputFolder = await mkdtemp(join(cacheFolder, "pg-tables-to-zod-"));
+  temporaryFolders.push(outputFolder);
+
+  await convert({
+    ...fixtureConfiguration,
+    input: { include: ["public.escape_check"] },
+    output: { outDir: outputFolder, defaultDescription: "Fixture" },
+  });
+
+  const escapeCheckTable = fixtureDatabase.schemas.get("public").tables.get("escape_check");
+  const noteColumn = escapeCheckTable.columns.get("note");
+  const quoteStyleType = fixtureDatabase.schemas.get("public").types.get("quote_style") as EnumType;
+
+  const { default: escapeCheckSchema } = (await import(
+    join(outputFolder, "public", "escape_check.ts")
+  )) as { default: z.ZodObject<{ note: z.ZodOptional<z.ZodString> }> };
+  const { QuoteStyleSchema } = (await import(join(outputFolder, "pg-types.ts"))) as {
+    QuoteStyleSchema: z.ZodEnum;
+  };
+
+  expect(escapeCheckSchema.description).toBe(escapeCheckTable.comment);
+  expect(escapeCheckSchema.shape.note.unwrap().description).toBe(
+    `${noteColumn.comment}. Database type: text. Default value: ${noteColumn.default}`,
+  );
+  expect(QuoteStyleSchema.options).toEqual(quoteStyleType.values);
+  expect(QuoteStyleSchema.description).toBe(quoteStyleType.comment);
 });
 
 test("fail converting when the configuration is invalid", async () => {
