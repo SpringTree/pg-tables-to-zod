@@ -70,13 +70,10 @@ export function addEnum({
   const enumName = `${upperFirst(camelCase(columnType))}`;
   const schemaName = `${enumName}Schema`;
 
+  // PostgreSQL enum values are always text labels
+  //
   const values = enumType.values;
-  const isNumeric = !!enumType.numericType;
-  let enumInitializer = isNumeric
-    ? `z.literal([${Array.from(values.keys())
-        .map((value) => `'${value}'`)
-        .join(",")}])`
-    : `z.enum([${values.map((value) => `'${escapeSingleQuotedString(value)}'`).join(",")}])`;
+  let enumInitializer = `z.enum([${values.map((value) => `'${escapeSingleQuotedString(value)}'`).join(",")}])`;
   if (description) {
     enumInitializer += `.describe(\`${escapeTemplateLiteral(description)}\`)`;
   }
