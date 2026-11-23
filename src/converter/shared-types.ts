@@ -2,7 +2,7 @@ import { join, resolve } from "node:path";
 import type { EnumType } from "pg-structure";
 import { camelCase, upperFirst } from "./camel-case.js";
 import { escapeSingleQuotedString, escapeTemplateLiteral } from "./escape.js";
-import { continuationIndent, GeneratedFile } from "./generated-file.js";
+import { GeneratedFile } from "./generated-file.js";
 
 // Creates the shared types file with the reusable Zod schemas for PostgreSQL types.
 // Enums are added to it by addEnum while the columns are converted
@@ -26,22 +26,23 @@ export function addSharedTypesFile({ outputFolder }: { outputFolder: string }) {
 
   // Declare the postgresql interval type
   //
-  const postgresqlIntervalInitializer = `z.union([
-${continuationIndent}		z.number().describe('Interval duration in seconds'),
-${continuationIndent}		z.string().describe('Descriptive interval duration i.e. 8 hours'),
-${continuationIndent}		z
-${continuationIndent}			.strictObject({
-${continuationIndent}				years: z.number().optional(),
-${continuationIndent}				months: z.number().optional(),
-${continuationIndent}				days: z.number().optional(),
-${continuationIndent}				hours: z.number().optional(),
-${continuationIndent}				minutes: z.number().optional(),
-${continuationIndent}				seconds: z.number().optional(),
-${continuationIndent}				milliseconds: z.number().optional(),
-${continuationIndent}			})
-${continuationIndent}			.describe('Interval duration as an object'),
-${continuationIndent}	])
-${continuationIndent}	.describe('Postgresql interval type')`;
+  const postgresqlIntervalInitializer = `z
+	.union([
+		z.number().describe('Interval duration in seconds'),
+		z.string().describe('Descriptive interval duration i.e. 8 hours'),
+		z
+			.strictObject({
+				years: z.number().optional(),
+				months: z.number().optional(),
+				days: z.number().optional(),
+				hours: z.number().optional(),
+				minutes: z.number().optional(),
+				seconds: z.number().optional(),
+				milliseconds: z.number().optional(),
+			})
+			.describe('Interval duration as an object'),
+	])
+	.describe('Postgresql interval type')`;
 
   // Add: export const PostgresqlIntervalSchema = ...
   // Add: export type TPostgresqlInterval = z.infer<typeof PostgresqlIntervalSchema>;

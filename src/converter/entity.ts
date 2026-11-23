@@ -3,7 +3,7 @@ import type { Entity } from "pg-structure";
 import { camelCase, upperFirst } from "./camel-case.js";
 import { convertColumn } from "./column.js";
 import { escapeTemplateLiteral } from "./escape.js";
-import { continuationIndent, GeneratedFile } from "./generated-file.js";
+import { GeneratedFile } from "./generated-file.js";
 
 // Helper method to convert a postgresql table to a Zod schema file
 // which is output either to files or to stdout
@@ -63,10 +63,10 @@ export function convertEntity({
   // Add the zod schema constant
   //
   const schemaInitializer = `z
-${continuationIndent}	.${strict ? "strictObject" : "object"}({
-${continuationIndent}		${columnSchemaCode.join(`,\n${continuationIndent}		`)}
-${continuationIndent}	})
-${continuationIndent}	.describe(\`${escapeTemplateLiteral(entity.comment || defaultDescription || `No description available for ${entity.name}`)}\`)`;
+	.${strict ? "strictObject" : "object"}({
+		${columnSchemaCode.join(",\n\t\t")}
+	})
+	.describe(\`${escapeTemplateLiteral(entity.comment || defaultDescription || `No description available for ${entity.name}`)}\`)`;
 
   // Add: const entitySchema = ...
   // Add: export type TEntity = z.infer<typeof entitySchema>;

@@ -1,9 +1,5 @@
 import { dirname, relative, sep } from "node:path";
 
-// Indentation of the continuation lines of a multi-line declaration, as the generated code has always been laid out
-//
-export const continuationIndent = "    ";
-
 // A TypeScript file being generated: named imports followed by statements.
 // Renders as:
 // - one import declaration per named import, without blank lines in between
