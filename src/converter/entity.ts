@@ -1,16 +1,14 @@
-import { join } from "node:path";
-import { camelCase, upperFirst } from "./camel-case.js";
+import { join, resolve } from "node:path";
 import type { Entity } from "pg-structure";
-import { type Project, type SourceFile, VariableDeclarationKind } from "ts-morph";
+import { camelCase, upperFirst } from "./camel-case.js";
 import { convertColumn } from "./column.js";
 import { escapeTemplateLiteral } from "./escape.js";
+import { continuationIndent, GeneratedFile } from "./generated-file.js";
 
-// Helper method to convert a postgresql table to a Zod schema
-// Which will be added to the ts-morph project to be output either
-// to files or to stdout
+// Helper method to convert a postgresql table to a Zod schema file
+// which is output either to files or to stdout
 //
 export function convertEntity({
-  project,
   strict,
   defaultDescription,
   outputFolder,
@@ -18,13 +16,12 @@ export function convertEntity({
   entity,
   sharedTypesFile,
 }: {
-  project: Project;
   strict: boolean;
   defaultDescription?: string;
   outputFolder: string;
   schemaName: string;
   entity: Entity;
-  sharedTypesFile: SourceFile;
+  sharedTypesFile: GeneratedFile;
 }) {
   const entityName = entity.name;
   const variableName = camelCase(entityName);
@@ -35,23 +32,20 @@ export function convertEntity({
   const folderName = join(outputFolder, schemaName);
   const fileName = join(folderName, `${entityName}.ts`);
 
-  const sourceFile = project.createSourceFile(fileName);
+  const sourceFile = new GeneratedFile(resolve(fileName));
 
   // Add: import { z } from 'zod';
-  sourceFile.addImportDeclaration({
-    moduleSpecifier: "zod",
-    namedImports: ["z"],
-  });
+  sourceFile.addNamedImport("z", "zod");
 
   // Check if any of the columns are using the PostgresqlInterval type
   // If so, import it from the shared types file
   //
   const usesPostgresqlInterval = columns.some((column) => column.type.name === "interval");
   if (usesPostgresqlInterval) {
-    sourceFile.addImportDeclaration({
-      moduleSpecifier: sourceFile.getRelativePathTo(sharedTypesFile).replace(/\.ts$/, ".js"),
-      namedImports: ["PostgresqlIntervalSchema"],
-    });
+    sourceFile.addNamedImport(
+      "PostgresqlIntervalSchema",
+      sourceFile.getModuleSpecifierTo(sharedTypesFile),
+    );
   }
 
   const columnSchemaCode: string[] = [];
@@ -69,33 +63,21 @@ export function convertEntity({
   // Add the zod schema constant
   //
   const schemaInitializer = `z
-	.${strict ? "strictObject" : "object"}({
-		${columnSchemaCode.join(",\n		")}
-	})
-	.describe(\`${escapeTemplateLiteral(entity.comment || defaultDescription || `No description available for ${entity.name}`)}\`)`;
+${continuationIndent}	.${strict ? "strictObject" : "object"}({
+${continuationIndent}		${columnSchemaCode.join(`,\n${continuationIndent}		`)}
+${continuationIndent}	})
+${continuationIndent}	.describe(\`${escapeTemplateLiteral(entity.comment || defaultDescription || `No description available for ${entity.name}`)}\`)`;
 
-  sourceFile.addVariableStatement({
-    declarationKind: VariableDeclarationKind.Const,
-    declarations: [
-      {
-        name: `${variableName}Schema`,
-        initializer: schemaInitializer,
-      },
-    ],
-  });
-
+  // Add: const entitySchema = ...
   // Add: export type TEntity = z.infer<typeof entitySchema>;
-  sourceFile.addTypeAlias({
-    name: `T${upperFirst(variableName)}`,
-    isExported: true,
-    type: `z.infer<typeof ${variableName}Schema>`,
-  });
-
   // Add: export default entitySchema;
-  sourceFile.addExportAssignment({
-    expression: `${variableName}Schema`,
-    isExportEquals: false,
-  });
+  sourceFile.addDeclaration(`${variableName}Schema`, [
+    `const ${variableName}Schema = ${schemaInitializer};`,
+    `export type T${upperFirst(variableName)} = z.infer<typeof ${variableName}Schema>;`,
+    `export default ${variableName}Schema;`,
+  ]);
 
   return sourceFile;
 }
+
+//

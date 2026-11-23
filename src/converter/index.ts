@@ -1,8 +1,10 @@
+import { mkdir, writeFile } from "node:fs/promises";
+import { basename, dirname, sep } from "node:path";
 import pgStructureImport, { type Schema } from "pg-structure";
-import { Project } from "ts-morph";
 import { checkConfiguration } from "../config/check.js";
 import type { TConfiguration } from "../config/index.js";
 import { convertEntity } from "./entity.js";
+import type { GeneratedFile } from "./generated-file.js";
 import { addSharedTypesFile } from "./shared-types.js";
 
 // pg-structure is CommonJS marked as transpiled ESM (__esModule). Importing its default export
@@ -11,6 +13,25 @@ import { addSharedTypesFile } from "./shared-types.js";
 const pgStructure =
   (pgStructureImport as unknown as { default?: typeof pgStructureImport }).default ??
   pgStructureImport;
+
+// Compares like "a".localeCompare("B"): case-insensitive, upper case first when only the case differs
+//
+function compareNames(name: string, otherName: string) {
+  return name.localeCompare(otherName, "en-us-u-kf-upper");
+}
+
+// Orders the files as the output has always been ordered: the shared types file in the output
+// folder first, then a folder per schema sorted by name, each with its files sorted by name
+//
+function compareGeneratedFiles(file: GeneratedFile, otherFile: GeneratedFile) {
+  const folder = dirname(file.filePath);
+  const otherFolder = dirname(otherFile.filePath);
+  return (
+    folder.split(sep).length - otherFolder.split(sep).length ||
+    compareNames(basename(folder), basename(otherFolder)) ||
+    compareNames(basename(file.filePath), basename(otherFile.filePath))
+  );
+}
 
 export interface IOutputZodSchema {
   // Output file path and name
@@ -48,21 +69,13 @@ export async function convert(configuration: TConfiguration): Promise<IOutputZod
   const outputFolder = configuration.output?.outDir || "dist/validators";
   const defaultDescription = configuration.output?.defaultDescription;
   const strict = configuration.output?.strict !== false;
-  const project = new Project({
-    compilerOptions: {
-      declaration: false,
-      outDir: outputFolder,
-    },
-  });
 
   // Add and prepare the shared PostgreSQL types and enums file
   // This file will contain reusable Zod schemas for PostgreSQL types
   // such as the interval type and any enums found in the database
   //
-  const sharedTypesFile = addSharedTypesFile({
-    project,
-    outputFolder,
-  });
+  const sharedTypesFile = addSharedTypesFile({ outputFolder });
+  const files = [sharedTypesFile];
 
   // Iterate all the schemas
   //
@@ -84,15 +97,16 @@ export async function convert(configuration: TConfiguration): Promise<IOutputZod
           includedEntities.indexOf(`${schemaName}.${tableName}`) !== -1)
       ) {
         console.warn(`Processing table ${schemaName}/${tableName}`);
-        convertEntity({
-          project,
-          strict,
-          defaultDescription,
-          outputFolder,
-          schemaName,
-          entity: table,
-          sharedTypesFile,
-        });
+        files.push(
+          convertEntity({
+            strict,
+            defaultDescription,
+            outputFolder,
+            schemaName,
+            entity: table,
+            sharedTypesFile,
+          }),
+        );
       } else {
         console.warn(`Skipping excluded table ${tableName}`);
       }
@@ -111,15 +125,16 @@ export async function convert(configuration: TConfiguration): Promise<IOutputZod
           includedEntities.indexOf(`${schemaName}.${viewName}`) !== -1)
       ) {
         console.warn(`Processing view ${schemaName}/${viewName}`);
-        convertEntity({
-          project,
-          strict,
-          defaultDescription,
-          outputFolder,
-          schemaName,
-          entity: view,
-          sharedTypesFile,
-        });
+        files.push(
+          convertEntity({
+            strict,
+            defaultDescription,
+            outputFolder,
+            schemaName,
+            entity: view,
+            sharedTypesFile,
+          }),
+        );
       }
     }
 
@@ -136,28 +151,33 @@ export async function convert(configuration: TConfiguration): Promise<IOutputZod
           includedEntities.indexOf(`${schemaName}.${viewName}`) !== -1)
       ) {
         console.warn(`Processing materialized view ${schemaName}/${viewName}`);
-        convertEntity({
-          project,
-          strict,
-          defaultDescription,
-          outputFolder,
-          schemaName,
-          entity: view,
-          sharedTypesFile,
-        });
+        files.push(
+          convertEntity({
+            strict,
+            defaultDescription,
+            outputFolder,
+            schemaName,
+            entity: view,
+            sharedTypesFile,
+          }),
+        );
       }
     }
   }
 
-  // Saving to disk if an output folder is specified in the configuration options
-  //
-  const files = project.getSourceFiles();
-  if (configuration.output?.outDir) {
-    console.warn(`Outputting files to ${outputFolder}`);
-    await project.save();
-  }
-  return files.map((file) => ({
-    path: file.getFilePath(),
+  const outputSchemas = files.sort(compareGeneratedFiles).map((file) => ({
+    path: file.filePath,
     schema: file.getFullText(),
   }));
+
+  // Saving to disk if an output folder is specified in the configuration options
+  //
+  if (configuration.output?.outDir) {
+    console.warn(`Outputting files to ${outputFolder}`);
+    for (const outputSchema of outputSchemas) {
+      await mkdir(dirname(outputSchema.path), { recursive: true });
+      await writeFile(outputSchema.path, outputSchema.schema);
+    }
+  }
+  return outputSchemas;
 }

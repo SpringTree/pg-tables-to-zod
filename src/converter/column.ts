@@ -1,5 +1,5 @@
 import { type Column, EnumType } from "pg-structure";
-import type { SourceFile } from "ts-morph";
+import type { GeneratedFile } from "./generated-file.js";
 import { escapeTemplateLiteral } from "./escape.js";
 import { addEnum } from "./shared-types.js";
 
@@ -16,8 +16,8 @@ export function convertColumn({
 }: {
   column: Column;
   defaultDescription?: string;
-  sharedTypesFile: SourceFile;
-  sourceFile: SourceFile;
+  sharedTypesFile: GeneratedFile;
+  sourceFile: GeneratedFile;
 }): string {
   const columnName = column.name;
   const columnType = column.type.name;
