@@ -199,6 +199,23 @@ test("fail running when the configuration file cannot be read", async () => {
   );
 });
 
+test("fail running when the removed unwrap option is given", async () => {
+  expect(await runCli([...connectionArguments, "--unwrap"])).toBe(1);
+  expect(consoleErrorSpy.mock.calls[0]?.[0]).toStartWith("Unknown option '--unwrap'");
+});
+
+test("fail running when the configuration file contains the removed unwrap setting", async () => {
+  const configPath = await writeConfigFile({
+    pg: { host: "localhost", database: "fixture", user: "postgres", password: "fixture-secret" },
+    input: {},
+    output: { unwrap: true },
+  });
+
+  expect(await runCli(["--config", configPath])).toBe(1);
+  expect(consoleErrorSpy.mock.calls[0]?.[0]).toBe("Configuration has issues:");
+  expect(connectToDatabase).not.toHaveBeenCalled();
+});
+
 test("fail running when the configuration is invalid", async () => {
   expect(await runCli([...connectionArguments, "--strict", "maybe"])).toBe(1);
   expect(consoleErrorSpy.mock.calls[0]?.[0]).toBe("Configuration has issues:");

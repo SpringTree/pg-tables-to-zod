@@ -6,13 +6,7 @@ const outputConfigurationSchema = z
       .string()
       .optional()
       .describe(
-        "The output folder to write all the schema files to. If omitted all the schemas will be output to STDOUT. When converting a single schema to STDOUT you will likely want to set the unwrap option",
-      ),
-    unwrap: z
-      .boolean()
-      .optional()
-      .describe(
-        "If a single schema is converted and output to STDOUT you can enable this flag to unwrap the schema from the output array",
+        "The output folder to write all the schema files to. If omitted all the schemas will be output to STDOUT.",
       ),
     strict: z
       .boolean()

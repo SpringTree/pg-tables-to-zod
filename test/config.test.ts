@@ -17,7 +17,6 @@ const exampleConfig: TConfiguration = {
     strict: true,
     defaultDescription: "Missing description",
     outDir: "",
-    unwrap: false,
   },
 };
 

@@ -23,7 +23,6 @@ Options:
   -s, --strict <value>          Allow additional properties on final schema. Default: true
   -t, --include-tables <value>  Comma separated list of tables to process. Default is all tables found
   -e, --exclude-tables <value>  Comma separated list of tables to exclude. Default is to not exclude any
-  -u, --unwrap                  Unwraps the schema if only 1 is returned
   -d, --desc <value>            Default description when database lacks one.
   -h, --help                    display help for command`;
 
@@ -46,7 +45,6 @@ function parseCliOptions(cliArguments: string[]) {
       "pg-schema": { type: "string" },
       "pg-user": { type: "string" },
       strict: { type: "string", short: "s" },
-      unwrap: { type: "boolean", short: "u" },
       version: { type: "boolean", short: "V" },
     },
   }).values;
@@ -93,7 +91,6 @@ export async function runCli(cliArguments: string[]): Promise<number> {
     },
     output: {
       outDir: options.out,
-      unwrap: options.unwrap,
       strict: strict as boolean | undefined,
       defaultDescription: options.desc,
     },
@@ -144,12 +141,9 @@ export async function runCli(cliArguments: string[]): Promise<number> {
   try {
     const outputSchemas = await convert(configuration);
     const outputFolder = configuration.output?.outDir;
-    const unwrap = configuration.output?.unwrap ?? false;
 
     if (!outputFolder) {
-      if (unwrap && outputSchemas.length === 1) {
-        console.log(outputSchemas[0]);
-      } else if (outputSchemas.length > 0) {
+      if (outputSchemas.length > 0) {
         console.log(JSON.stringify(outputSchemas, null, 2));
       }
     } else {
