@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { camelCase, upperFirst } from "lodash-es";
+import { camelCase, upperFirst } from "./camel-case.js";
 import type { EnumType } from "pg-structure";
 import { type Project, type SourceFile, VariableDeclarationKind } from "ts-morph";
 import escapeSingleQuotes from "./escape-single-quotes";
