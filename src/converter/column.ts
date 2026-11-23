@@ -29,11 +29,12 @@ export function convertColumn({
     description += ` Enumeration values: ${values.join(", ")}`;
   }
 
+  // The cases are the type names PostgreSQL reports, aliases like int or float8 never occur
+  //
   let typeSchema: string = "";
   switch (columnType) {
     case "bit":
     case "bit varying":
-    case "varbit":
     case "character":
     case "character varying":
     case "text":
@@ -64,7 +65,6 @@ export function convertColumn({
 
     case "timestamp with time zone":
     case "timestamp without time zone":
-    case "timestamp":
       {
         typeSchema = `z.iso.datetime()`;
       }
@@ -76,7 +76,6 @@ export function convertColumn({
       }
       break;
 
-    case "int":
     case "integer":
     case "smallint":
       {
@@ -85,9 +84,7 @@ export function convertColumn({
       break;
 
     case "bigint":
-    case "decimal":
     case "double precision":
-    case "float8":
     case "numeric":
     case "real":
       {
