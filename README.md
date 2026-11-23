@@ -60,6 +60,17 @@ You can then use bun run to generate output schemas and validate any code change
 bun run src/cli.ts -c my-config.json
 ```
 
+### :test_tube: Testing
+
+```bash
+bun run test
+bun run test:coverage
+```
+
+The tests do not need a database. They load the fixture database from `test/fixtures/database.json`, the serialized structure of `test/fixtures/database.sql`.
+The generated schemas are compared to the snapshots in `test/__snapshots__`. Review a snapshot change like a code change, then update the snapshots with `bun test --update-snapshots`.
+After changing `database.sql` or upgrading pg-structure, regenerate `database.json` as described in `test/fixtures/serialize-database.ts`.
+
 ### :cool: Technology stack
 
 - bun
