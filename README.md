@@ -72,10 +72,24 @@ bun run src/cli.ts -c my-config.json
 The `main` branch has protection enabled against direct pushes.
 All changes need to be done through a reviewed pull request.
 
+### :lock: Supply chain
+
+- `.npmrc` and `bunfig.toml` refuse package versions published less than 7 days ago (package quarantine)
+- Pull requests run the shared [supply-chain gates](https://github.com/SpringTree/springtree-ci-workflows) (secrets, licences, code and package quarantine) from `compliance.yml`
+- GitHub Actions are pinned by commit SHA
+
 ## :up: Deploying
 
-Package is published to NPM using trusted publishing from the GitHub action called release.
-The version bump can be done by running `bun run release`
+Releases are fully handled by GitHub Actions; never publish from a laptop.
+
+1. Merge pull requests with [conventional commit](https://www.conventionalcommits.org) messages into `main`
+2. [release-please](https://github.com/googleapis/release-please-action) opens or updates a release pull request with the version bump and changelog
+3. Merging the release pull request creates the tag and GitHub release, and the release workflow publishes to npm using [trusted publishing](https://docs.npmjs.com/trusted-publishers)
+
+One-time setup:
+
+- npm: trusted publisher for this repository and `release.yml`
+- GitHub: an organization GitHub App with contents, pull requests and issues write access on this repository; its client id as the `RELEASE_APP_CLIENT_ID` repository variable and its private key as the `RELEASE_APP_PRIVATE_KEY` repository secret
 
 ## Contributing
 

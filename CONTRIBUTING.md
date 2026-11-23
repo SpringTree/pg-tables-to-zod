@@ -28,7 +28,8 @@ Thank you for your interest in contributing to our project! This guide will help
 
 ## Commit Message Conventions
 
-We follow [Conventional Commits](https://www.conventionalcommits.org/) for clear and structured commit messages:
+We follow [Conventional Commits](https://www.conventionalcommits.org/) for clear and structured commit messages.
+A git hook checks them with [commitlint](https://commitlint.js.org). They also decide the next version and the changelog when releasing:
 
 - `feat:` New features
 - `fix:` Bug fixes

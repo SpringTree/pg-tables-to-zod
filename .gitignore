@@ -21,4 +21,5 @@ yarn-error.log*
 
 # Test configurations and output
 /*-config.json
+!/release-please-config.json
 dump
