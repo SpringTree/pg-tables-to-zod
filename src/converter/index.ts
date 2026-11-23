@@ -1,9 +1,16 @@
-import pgStructure, { type Schema } from "pg-structure";
+import pgStructureImport, { type Schema } from "pg-structure";
 import { Project } from "ts-morph";
 import { checkConfiguration } from "../config/check.js";
 import type { TConfiguration } from "../config/index.js";
 import { convertEntity } from "./entity.js";
 import { addSharedTypesFile } from "./shared-types.js";
+
+// pg-structure is CommonJS marked as transpiled ESM (__esModule). Importing its default export
+// gives the function under Bun, but the whole module object under Node.js, with the function at .default
+//
+const pgStructure =
+  (pgStructureImport as unknown as { default?: typeof pgStructureImport }).default ??
+  pgStructureImport;
 
 export interface IOutputZodSchema {
   // Output file path and name

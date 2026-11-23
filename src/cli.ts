@@ -1,112 +1,118 @@
-import { program } from "commander";
-import { merge } from "lodash-es";
-import prompts from "prompts";
+#!/usr/bin/env node
+import { parseArgs } from "node:util";
 import { z } from "zod";
 import { version } from "../package.json";
 import { checkConfiguration } from "./config/check.js";
 import type { TConfiguration } from "./config/index.js";
+import { mergeConfigurations } from "./config/merge.js";
 import { readConfigFile } from "./config/read-file.js";
 import { convert } from "./converter/index.js";
+import { promptPassword } from "./prompt-password.js";
 
-// Collect command-line options and arguments
+const helpText = `Usage: pgtables2zod [options]
+
+Options:
+  -V, --version                 output the version number
+  -c, --config <value>          Path to configuration file. Additional parameters override config values
+  --pg-host <value>             The postgresql host to connect to
+  --pg-port <n>                 The postgresql port to connect to. Defaults to 5432
+  --pg-database <value>         The postgresql database to connect to
+  --pg-user <value>             The postgresql user to login with
+  --pg-password <value>         The postgresql password to login with
+  --pg-schema <value>           Comma separated list of schemas to convert
+  -o, --out <folder>            Output folder. Default output is to STDOUT. A sub-folder will be created per schema
+  -s, --strict <value>          Allow additional properties on final schema. Default: true
+  -t, --include-tables <value>  Comma separated list of tables to process. Default is all tables found
+  -e, --exclude-tables <value>  Comma separated list of tables to exclude. Default is to not exclude any
+  -u, --unwrap                  Unwraps the schema if only 1 is returned
+  -d, --desc <value>            Default description when database lacks one.
+  -h, --help                    display help for command`;
+
+// Collect command-line options. parseArgs is built into Node.js and Bun and throws on unknown options
 //
-program
-  .version(version)
-  .usage("[options]")
-  .option(
-    "-c, --config <value>",
-    "Path to configuration file. Additional parameters override config values",
-  )
-  .option("--pg-host <value>", "The postgresql host to connect to")
-  .option("--pg-port <n>", "The postgresql host to connect to. Defaults to 5432")
-  .option("--pg-database <value>", "The postgresql database to connect to")
-  .option("--pg-user <value>", "The postgresql user to login with")
-  .option("--pg-password <value>", "The postgresql password to login with")
-  .option("--pg-schema <value>", "Comma separated list of schemas to convert")
-  .option(
-    "-o, --out [file]",
-    "Output folder. Default output is to STDOUT. A sub-folder will be created per schema",
-  )
-  .option("-s, --strict <value>", "Allow additional properties on final schema. Default: true")
-  .option(
-    "-t, --include-tables <value>",
-    "Comma separated list of tables to process. Default is all tables found",
-  )
-  .option(
-    "-e, --exclude-tables <value>",
-    "Comma separated list of tables to exclude. Default is to not exclude any",
-  )
-  .option("-u, --unwrap", "Unwraps the schema if only 1 is returned")
-  .option("-d, --desc <value>", "Default description when database lacks one.")
-
-  .parse(process.argv);
-
-program.parse();
-
-const options = program.opts();
-
-if (Object.keys(options).length === 0) {
-  program.help();
-}
-
-const {
-  config,
-  pgHost,
-  pgPort,
-  pgDatabase,
-  pgUser,
-  pgPassword,
-  pgSchema,
-  out,
-  strict,
-  includeTables,
-  excludeTables,
-  unwrap,
-  desc,
-} = options;
-
-let configuration: TConfiguration = {
-  pg: {
-    host: pgHost,
-    database: pgDatabase,
-    port: pgPort ?? 5432,
-    user: pgUser,
-    password: pgPassword,
-  },
-  input: {
-    schemas: pgSchema ? pgSchema.split(",") : undefined,
-    include: includeTables ? includeTables.split(",") : undefined,
-    exclude: excludeTables ? excludeTables.split(",") : undefined,
-  },
-  output: {
-    outDir: out,
-    unwrap: unwrap,
-    strict: strict,
-    defaultDescription: desc,
-  },
-};
-if (config) {
+function parseCliOptions() {
   try {
-    // Apply the configuration file values, overridden by CLI options
-    //
-    const configFromFile = await readConfigFile(config);
-    configuration = merge(configuration, configFromFile, configuration);
+    return parseArgs({
+      options: {
+        config: { type: "string", short: "c" },
+        desc: { type: "string", short: "d" },
+        "exclude-tables": { type: "string", short: "e" },
+        help: { type: "boolean", short: "h" },
+        "include-tables": { type: "string", short: "t" },
+        out: { type: "string", short: "o" },
+        "pg-database": { type: "string" },
+        "pg-host": { type: "string" },
+        "pg-password": { type: "string" },
+        "pg-port": { type: "string" },
+        "pg-schema": { type: "string" },
+        "pg-user": { type: "string" },
+        strict: { type: "string", short: "s" },
+        unwrap: { type: "boolean", short: "u" },
+        version: { type: "boolean", short: "V" },
+      },
+    }).values;
   } catch (error) {
-    console.error(`Failed to read configuration file at ${config}:`, error);
+    console.error(`${(error as Error).message}\n\n${helpText}`);
     process.exit(1);
   }
 }
 
+const options = parseCliOptions();
+
+if (options.version) {
+  console.log(version);
+  process.exit(0);
+}
+if (options.help || Object.keys(options).length === 0) {
+  console.log(helpText);
+  process.exit(0);
+}
+
+// Option values are strings. Port and strict are converted so the configuration check accepts them.
+// A strict value other than true or false is passed on as is for the check to report
+//
+const strictOption = options.strict;
+const strict = strictOption === "true" ? true : strictOption === "false" ? false : strictOption;
+
+const cliConfiguration: TConfiguration = {
+  pg: {
+    host: options["pg-host"] as string,
+    database: options["pg-database"] as string,
+    port: options["pg-port"] === undefined ? undefined : Number(options["pg-port"]),
+    user: options["pg-user"] as string,
+    password: options["pg-password"],
+  },
+  input: {
+    schemas: options["pg-schema"]?.split(","),
+    include: options["include-tables"]?.split(","),
+    exclude: options["exclude-tables"]?.split(","),
+  },
+  output: {
+    outDir: options.out,
+    unwrap: options.unwrap,
+    strict: strict as boolean | undefined,
+    defaultDescription: options.desc,
+  },
+};
+
+let configuration = cliConfiguration;
+if (options.config) {
+  try {
+    // Apply the configuration file values, overridden by CLI options
+    //
+    const configFromFile = await readConfigFile(options.config);
+    configuration = mergeConfigurations(configFromFile, cliConfiguration);
+  } catch (error) {
+    console.error(`Failed to read configuration file at ${options.config}:`, error);
+    process.exit(1);
+  }
+}
+configuration.pg.port ??= 5432;
+
 // If password is not provided, prompt for it
 //
 if (!configuration.pg.password) {
-  const response = await prompts({
-    type: "password",
-    name: "password",
-    message: "Password?",
-  });
-
-  configuration.pg.password = response.password;
+  configuration.pg.password = await promptPassword("Password? ");
 }
 
 // Check the configuration using Zod
@@ -143,3 +149,5 @@ try {
   console.error("Suggestion: Run with --help for parameters or check supplied configuration");
   process.exit(-1);
 }
+
+//
