@@ -24,7 +24,7 @@ const outputConfigurationSchema = z
       .string()
       .optional()
       .describe(
-        "The default description to set for structure items that lack one. Defaults to the current date and time of the import",
+        "The default description to set for structure items that lack one. Defaults to: No description available for <name>",
       ),
   })
   .strict()

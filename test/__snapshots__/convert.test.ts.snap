@@ -209,7 +209,7 @@ export default salesOrderSchema;
 ]
 `;
 
-exports[`successfully convert to non strict objects without column descriptions when strict is false and no default description is set 1`] = `
+exports[`successfully convert to non strict objects with fallback descriptions when strict is false and no default description is set 1`] = `
 [
   {
     "path": "pg-types.ts",
@@ -254,11 +254,11 @@ import { OrderStatusSchema } from "../pg-types.js";
 
 const salesOrderSchema = z
     	.object({
-    		id: z.int(),
-    		status: OrderStatusSchema,
-    		history: z.array(OrderStatusSchema).optional(),
-    		processing_time: PostgresqlIntervalSchema.optional(),
-    		payload: z.json().optional()
+    		id: z.int().describe(\`No description available for column id. Database type: integer. Default value: \`),
+    		status: OrderStatusSchema.describe(\`No description available for column status. Database type: order_status. Default value:  Enumeration values: new, paid, shipped\`),
+    		history: z.array(OrderStatusSchema).describe(\`No description available for column history. Database type: order_status. Default value:  Enumeration values: new, paid, shipped\`).optional(),
+    		processing_time: PostgresqlIntervalSchema.describe(\`No description available for column processing_time. Database type: interval. Default value: \`).optional(),
+    		payload: z.json().describe(\`No description available for column payload. Database type: json. Default value: \`).optional()
     	})
     	.describe(\`An order placed in the shop\`);
 

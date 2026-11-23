@@ -136,9 +136,7 @@ export function convertColumn({
   if (column.length) {
     typeSchema += `.max(${column.length})`;
   }
-  if (defaultDescription) {
-    typeSchema += `.describe(\`${escapeTemplateLiteral(description)}\`)`;
-  }
+  typeSchema += `.describe(\`${escapeTemplateLiteral(description)}\`)`;
 
   // If the column is nullable or has a default value, make it optional
   //

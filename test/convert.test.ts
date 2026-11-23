@@ -93,7 +93,7 @@ test("successfully convert the public schema when no schemas are configured", as
   ]);
 });
 
-test("successfully convert to non strict objects without column descriptions when strict is false and no default description is set", async () => {
+test("successfully convert to non strict objects with fallback descriptions when strict is false and no default description is set", async () => {
   const outputSchemas = await convertToRelativePaths(
     {
       pg: pgConfiguration,
@@ -185,7 +185,7 @@ test("successfully keep comments, defaults and enum values intact when they cont
   await convert({
     ...fixtureConfiguration,
     input: { include: ["public.escape_check"] },
-    output: { outDir: outputFolder, defaultDescription: "Fixture" },
+    output: { outDir: outputFolder },
   });
 
   const escapeCheckTable = fixtureDatabase.schemas.get("public").tables.get("escape_check");
