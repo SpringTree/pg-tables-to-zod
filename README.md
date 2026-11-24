@@ -83,6 +83,12 @@ After changing `database.sql` or upgrading pg-structure, regenerate `database.js
 The `main` branch has protection enabled against direct pushes.
 All changes need to be done through a reviewed pull request.
 
+The protection comes from the organization rulesets, enabled by this repository's custom properties:
+
+- `conventional-pr-title`: requires the `pull-request-title / conventional` check from `pull-request-title.yml`
+- `reviewer-approval-required`: requires an approving review and squash merges
+- `supply-chain-gates`: requires the `supply-chain / secrets`, `licences`, `code` and `quarantine` checks from `compliance.yml`
+
 ### :lock: Supply chain
 
 - `.npmrc` and `bunfig.toml` refuse package versions published less than 7 days ago (package quarantine)
