@@ -87,14 +87,14 @@ All changes need to be done through a reviewed pull request.
 
 - `.npmrc` and `bunfig.toml` refuse package versions published less than 7 days ago (package quarantine)
 - Pull requests run the shared [supply-chain gates](https://github.com/SpringTree/springtree-ci-workflows) (secrets, licences, code and package quarantine) from `compliance.yml`
-- Pull request titles are checked as conventional commits by the organization's required [title check](https://github.com/SpringTree/springtree-ci-workflows), enabled by the `conventional-pr-title` custom property
+- Pull request titles are checked as conventional commits by the shared title check in `pull-request-title.yml`
 - GitHub Actions are pinned by commit SHA
 
 ## :up: Deploying
 
 Releases are fully handled by GitHub Actions; never publish from a laptop.
 
-1. Squash merge pull requests into `main`. The pull request title becomes the commit and must be a [conventional commit](https://www.conventionalcommits.org), checked by the organization's required title check
+1. Squash merge pull requests into `main`. The pull request title becomes the commit and must be a [conventional commit](https://www.conventionalcommits.org), checked by `pull-request-title.yml`
 2. [release-please](https://github.com/googleapis/release-please-action) opens or updates a release pull request with the version bump and changelog
 3. Merging the release pull request creates the tag and GitHub release, and the release workflow publishes to npm using [trusted publishing](https://docs.npmjs.com/trusted-publishers)
 
