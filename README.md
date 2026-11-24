@@ -100,7 +100,8 @@ Releases are fully handled by GitHub Actions; never publish from a laptop.
 
 One-time setup:
 
-- npm: trusted publisher for this repository and `release.yml`
+- GitHub: an `npm-publish` environment that only the `main` branch may deploy to (Settings → Environments → Deployment branches). Create it before the first release: GitHub creates a missing environment without that restriction
+- npm: trusted publisher for this repository, `release.yml` and the `npm-publish` environment
 - GitHub: an organization GitHub App with contents, pull requests and issues write access on this repository; its client id as the `RELEASE_APP_CLIENT_ID` repository variable and its private key as the `RELEASE_APP_PRIVATE_KEY` repository secret
 
 ## Contributing

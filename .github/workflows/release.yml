@@ -37,6 +37,8 @@ jobs:
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     runs-on: ubuntu-latest
+    # Must match the environment on the npm trusted publisher; only `main` may deploy to it
+    environment: npm-publish
     permissions:
       contents: read
       id-token: write # OIDC for npm trusted publishing
