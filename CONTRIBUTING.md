@@ -28,7 +28,9 @@ Thank you for your interest in contributing to our project! This guide will help
 
 ## Commit Message Conventions
 
-We follow [Conventional Commits](https://www.conventionalcommits.org/) for clear and structured commit messages:
+We follow [Conventional Commits](https://www.conventionalcommits.org/) for clear and structured commit messages.
+A git hook checks them with [commitlint](https://commitlint.js.org).
+Pull requests are squash merged, so the pull request title becomes the commit on `main`. It must follow the same conventions and is checked on every pull request. It decides the next version and the changelog when releasing:
 
 - `feat:` New features
 - `fix:` Bug fixes

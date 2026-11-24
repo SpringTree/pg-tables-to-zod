@@ -1,0 +1,274 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`successfully convert all tables, views and materialized views 1`] = `
+[
+  {
+    "path": "pg-types.ts",
+    "schema": 
+"import { z } from "zod";
+
+export const JsonTypeSchema = z.json().describe('Postgresql JSON type');
+
+export type TJsonType = z.infer<typeof JsonTypeSchema>;
+
+export const PostgresqlIntervalSchema = z
+	.union([
+		z.number().describe('Interval duration in seconds'),
+		z.string().describe('Descriptive interval duration i.e. 8 hours'),
+		z
+			.strictObject({
+				years: z.number().optional(),
+				months: z.number().optional(),
+				days: z.number().optional(),
+				hours: z.number().optional(),
+				minutes: z.number().optional(),
+				seconds: z.number().optional(),
+				milliseconds: z.number().optional(),
+			})
+			.describe('Interval duration as an object'),
+	])
+	.describe('Postgresql interval type');
+
+export type TPostgresqlInterval = z.infer<typeof PostgresqlIntervalSchema>;
+
+export const QuoteStyleSchema = z.enum(['it\\'s','back\\\\\\\\slash','tick\`','\${placeholder}']).describe(\`Enum with \\\`backticks\\\`, \\\${braces} and a \\\\ backslash\`);
+
+export type EQuoteStyle = z.infer<typeof QuoteStyleSchema>;
+
+export const OrderStatusSchema = z.enum(['new','paid','shipped']).describe(\`Status of an order\`);
+
+export type EOrderStatus = z.infer<typeof OrderStatusSchema>;
+
+export const PrioritySchema = z.enum(['low','high']);
+
+export type EPriority = z.infer<typeof PrioritySchema>;
+"
+,
+  },
+  {
+    "path": "public/audit_entry.ts",
+    "schema": 
+"import { z } from "zod";
+
+const auditEntrySchema = z
+	.strictObject({
+		id: z.int().describe(\`Fixture. Database type: integer. Default value: \`)
+	})
+	.describe(\`Fixture\`);
+
+export type TAuditEntry = z.infer<typeof auditEntrySchema>;
+
+export default auditEntrySchema;
+"
+,
+  },
+  {
+    "path": "public/customer_account.ts",
+    "schema": 
+"import { z } from "zod";
+
+const customerAccountSchema = z
+	.strictObject({
+		id: z.uuid().describe(\`Fixture. Database type: uuid. Default value: \`),
+		email: z.string().max(120).describe(\`The customer's e-mail. Database type: character varying. Default value: \`),
+		country_code: z.string().max(2).describe(\`Fixture. Database type: character. Default value: \`),
+		display_name: z.string().describe(\`Fixture. Database type: text. Default value: \`).optional(),
+		avatar: z.string().describe(\`Fixture. Database type: bytea. Default value: \`).optional(),
+		flags: z.string().max(3).describe(\`Fixture. Database type: bit. Default value: \`).optional(),
+		feature_mask: z.string().max(8).describe(\`Fixture. Database type: bit varying. Default value: \`).optional(),
+		is_active: z.boolean().describe(\`Fixture. Database type: boolean. Default value: true\`).optional(),
+		login_count: z.int().describe(\`Fixture. Database type: integer. Default value: 0\`).optional(),
+		visits: z.number().describe(\`Fixture. Database type: bigint. Default value: \`).optional(),
+		balance: z.number().describe(\`Fixture. Database type: numeric. Default value: \`).optional(),
+		score: z.number().describe(\`Fixture. Database type: double precision. Default value: \`).optional(),
+		ratio: z.number().describe(\`Fixture. Database type: real. Default value: \`).optional(),
+		rank: z.int().describe(\`Fixture. Database type: smallint. Default value: \`).optional(),
+		birth_date: z.iso.date().describe(\`Fixture. Database type: date. Default value: \`).optional(),
+		wakes_at: z.iso.time().describe(\`Fixture. Database type: time without time zone. Default value: \`).optional(),
+		wakes_at_tz: z.iso.time().describe(\`Fixture. Database type: time with time zone. Default value: \`).optional(),
+		created_at: z.iso.datetime().describe(\`Fixture. Database type: timestamp with time zone. Default value: now()\`).optional(),
+		updated_at: z.iso.datetime().describe(\`Fixture. Database type: timestamp without time zone. Default value: \`).optional(),
+		preferences: z.json().describe(\`Fixture. Database type: jsonb. Default value: '{}'\`).optional(),
+		raw_preferences: z.json().describe(\`Fixture. Database type: json. Default value: \`).optional(),
+		tags: z.array(z.string()).describe(\`Fixture. Database type: text. Default value: \`).optional(),
+		lucky_numbers: z.array(z.int()).describe(\`Fixture. Database type: integer. Default value: \`).optional(),
+		ip_address: z.any().describe(\`Fixture. Database type: inet. Default value: \`).optional()
+	})
+	.describe(\`A customer's account\`);
+
+export type TCustomerAccount = z.infer<typeof customerAccountSchema>;
+
+export default customerAccountSchema;
+"
+,
+  },
+  {
+    "path": "public/escape_check.ts",
+    "schema": 
+"import { z } from "zod";
+import { QuoteStyleSchema } from "../pg-types.js";
+
+const escapeCheckSchema = z
+	.strictObject({
+		id: z.int().describe(\`Fixture. Database type: integer. Default value: \`),
+		style: QuoteStyleSchema.describe(\`Fixture. Database type: quote_style. Default value:  Enumeration values: it's, back\\\\\\\\slash, tick\\\`, \\\${placeholder}\`).optional(),
+		note: z.string().describe(\`Two
+lines with \\\`tick\\\`, \\\${braces} and \\\\u0041. Database type: text. Default value: 'it''s \\\`x\\\` \\\${y} \\\\u0041'\`).optional()
+	})
+	.describe(\`Table with \\\`backticks\\\`, \\\${braces}, a \\\\ backslash and it's quoted\`);
+
+export type TEscapeCheck = z.infer<typeof escapeCheckSchema>;
+
+export default escapeCheckSchema;
+"
+,
+  },
+  {
+    "path": "public/HTTPRequestLog.ts",
+    "schema": 
+"import { z } from "zod";
+import { PostgresqlIntervalSchema } from "../pg-types.js";
+import { OrderStatusSchema } from "../pg-types.js";
+import { PrioritySchema } from "../pg-types.js";
+
+const httpRequestLogSchema = z
+	.strictObject({
+		id: z.number().describe(\`Fixture. Database type: bigint. Default value: \`),
+		took: PostgresqlIntervalSchema.describe(\`Fixture. Database type: interval. Default value: \`).optional(),
+		status: OrderStatusSchema.describe(\`Fixture. Database type: order_status. Default value:  Enumeration values: new, paid, shipped\`).optional(),
+		urgency: PrioritySchema.describe(\`Fixture. Database type: priority. Default value:  Enumeration values: low, high\`).optional()
+	})
+	.describe(\`Fixture\`);
+
+export type THttpRequestLog = z.infer<typeof httpRequestLogSchema>;
+
+export default httpRequestLogSchema;
+"
+,
+  },
+  {
+    "path": "shop/order_totals.ts",
+    "schema": 
+"import { z } from "zod";
+import { OrderStatusSchema } from "../pg-types.js";
+
+const orderTotalsSchema = z
+	.strictObject({
+		status: OrderStatusSchema.describe(\`Fixture. Database type: order_status. Default value:  Enumeration values: new, paid, shipped\`).optional(),
+		total: z.number().describe(\`Fixture. Database type: bigint. Default value: \`).optional()
+	})
+	.describe(\`Fixture\`);
+
+export type TOrderTotals = z.infer<typeof orderTotalsSchema>;
+
+export default orderTotalsSchema;
+"
+,
+  },
+  {
+    "path": "shop/paid_orders.ts",
+    "schema": 
+"import { z } from "zod";
+import { OrderStatusSchema } from "../pg-types.js";
+
+const paidOrdersSchema = z
+	.strictObject({
+		id: z.int().describe(\`Fixture. Database type: integer. Default value: \`).optional(),
+		status: OrderStatusSchema.describe(\`Fixture. Database type: order_status. Default value:  Enumeration values: new, paid, shipped\`).optional()
+	})
+	.describe(\`Fixture\`);
+
+export type TPaidOrders = z.infer<typeof paidOrdersSchema>;
+
+export default paidOrdersSchema;
+"
+,
+  },
+  {
+    "path": "shop/sales_order.ts",
+    "schema": 
+"import { z } from "zod";
+import { PostgresqlIntervalSchema } from "../pg-types.js";
+import { OrderStatusSchema } from "../pg-types.js";
+
+const salesOrderSchema = z
+	.strictObject({
+		id: z.int().describe(\`Fixture. Database type: integer. Default value: \`),
+		status: OrderStatusSchema.describe(\`Fixture. Database type: order_status. Default value:  Enumeration values: new, paid, shipped\`),
+		history: z.array(OrderStatusSchema).describe(\`Fixture. Database type: order_status. Default value:  Enumeration values: new, paid, shipped\`).optional(),
+		processing_time: PostgresqlIntervalSchema.describe(\`Fixture. Database type: interval. Default value: \`).optional(),
+		payload: z.json().describe(\`Fixture. Database type: json. Default value: \`).optional()
+	})
+	.describe(\`An order placed in the shop\`);
+
+export type TSalesOrder = z.infer<typeof salesOrderSchema>;
+
+export default salesOrderSchema;
+"
+,
+  },
+]
+`;
+
+exports[`successfully convert to non strict objects with fallback descriptions when strict is false and no default description is set 1`] = `
+[
+  {
+    "path": "pg-types.ts",
+    "schema": 
+"import { z } from "zod";
+
+export const JsonTypeSchema = z.json().describe('Postgresql JSON type');
+
+export type TJsonType = z.infer<typeof JsonTypeSchema>;
+
+export const PostgresqlIntervalSchema = z
+	.union([
+		z.number().describe('Interval duration in seconds'),
+		z.string().describe('Descriptive interval duration i.e. 8 hours'),
+		z
+			.strictObject({
+				years: z.number().optional(),
+				months: z.number().optional(),
+				days: z.number().optional(),
+				hours: z.number().optional(),
+				minutes: z.number().optional(),
+				seconds: z.number().optional(),
+				milliseconds: z.number().optional(),
+			})
+			.describe('Interval duration as an object'),
+	])
+	.describe('Postgresql interval type');
+
+export type TPostgresqlInterval = z.infer<typeof PostgresqlIntervalSchema>;
+
+export const OrderStatusSchema = z.enum(['new','paid','shipped']).describe(\`Status of an order\`);
+
+export type EOrderStatus = z.infer<typeof OrderStatusSchema>;
+"
+,
+  },
+  {
+    "path": "shop/sales_order.ts",
+    "schema": 
+"import { z } from "zod";
+import { PostgresqlIntervalSchema } from "../pg-types.js";
+import { OrderStatusSchema } from "../pg-types.js";
+
+const salesOrderSchema = z
+	.object({
+		id: z.int().describe(\`No description available for column id. Database type: integer. Default value: \`),
+		status: OrderStatusSchema.describe(\`No description available for column status. Database type: order_status. Default value:  Enumeration values: new, paid, shipped\`),
+		history: z.array(OrderStatusSchema).describe(\`No description available for column history. Database type: order_status. Default value:  Enumeration values: new, paid, shipped\`).optional(),
+		processing_time: PostgresqlIntervalSchema.describe(\`No description available for column processing_time. Database type: interval. Default value: \`).optional(),
+		payload: z.json().describe(\`No description available for column payload. Database type: json. Default value: \`).optional()
+	})
+	.describe(\`An order placed in the shop\`);
+
+export type TSalesOrder = z.infer<typeof salesOrderSchema>;
+
+export default salesOrderSchema;
+"
+,
+  },
+]
+`;

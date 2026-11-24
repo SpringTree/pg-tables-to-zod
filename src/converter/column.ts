@@ -1,6 +1,6 @@
 import { type Column, EnumType } from "pg-structure";
-import type { SourceFile } from "ts-morph";
-import escapeSingleQuotes from "./escape-single-quotes.js";
+import type { GeneratedFile } from "./generated-file.js";
+import { escapeTemplateLiteral } from "./escape.js";
 import { addEnum } from "./shared-types.js";
 
 /**
@@ -16,24 +16,25 @@ export function convertColumn({
 }: {
   column: Column;
   defaultDescription?: string;
-  sharedTypesFile: SourceFile;
-  sourceFile: SourceFile;
+  sharedTypesFile: GeneratedFile;
+  sourceFile: GeneratedFile;
 }): string {
   const columnName = column.name;
   const columnType = column.type.name;
   const isArray = column.arrayDimension > 0;
   const enumType = column.type instanceof EnumType ? (column.type as EnumType) : undefined;
-  let description = `${escapeSingleQuotes(column.comment) || defaultDescription || `No description available for column ${columnName}`}. Database type: ${columnType}. Default value: ${escapeSingleQuotes(column.default)}`;
+  let description = `${column.comment || defaultDescription || `No description available for column ${columnName}`}. Database type: ${columnType}. Default value: ${column.default ?? ""}`;
   if (enumType) {
     const values = enumType.values;
     description += ` Enumeration values: ${values.join(", ")}`;
   }
 
+  // The cases are the type names PostgreSQL reports, aliases like int or float8 never occur
+  //
   let typeSchema: string = "";
   switch (columnType) {
     case "bit":
     case "bit varying":
-    case "varbit":
     case "character":
     case "character varying":
     case "text":
@@ -64,7 +65,6 @@ export function convertColumn({
 
     case "timestamp with time zone":
     case "timestamp without time zone":
-    case "timestamp":
       {
         typeSchema = `z.iso.datetime()`;
       }
@@ -76,7 +76,6 @@ export function convertColumn({
       }
       break;
 
-    case "int":
     case "integer":
     case "smallint":
       {
@@ -85,9 +84,7 @@ export function convertColumn({
       break;
 
     case "bigint":
-    case "decimal":
     case "double precision":
-    case "float8":
     case "numeric":
     case "real":
       {
@@ -136,9 +133,7 @@ export function convertColumn({
   if (column.length) {
     typeSchema += `.max(${column.length})`;
   }
-  if (defaultDescription) {
-    typeSchema += `.describe(\`${description}\`)`;
-  }
+  typeSchema += `.describe(\`${escapeTemplateLiteral(description)}\`)`;
 
   // If the column is nullable or has a default value, make it optional
   //
