@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.2](https://github.com/SpringTree/pg-tables-to-zod/compare/v2.0.1...v2.0.2) (2026-11-26)
+
+
+### Bug Fixes
+
+* **cli:** exit when a conversion fails instead of hanging on the database connection ([#8](https://github.com/SpringTree/pg-tables-to-zod/issues/8)) ([7ccf9a9](https://github.com/SpringTree/pg-tables-to-zod/commit/7ccf9a95a9c13eb74b73033300eaad98f829316d))
+
 ## [2.0.1](https://github.com/SpringTree/pg-tables-to-zod/compare/v2.0.0...v2.0.1) (2026-11-26)
 
 
