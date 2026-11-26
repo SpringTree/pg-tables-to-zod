@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/SpringTree/pg-tables-to-zod/compare/v2.0.0...v2.0.1) (2026-11-26)
+
+
+### Bug Fixes
+
+* **package:** allow require() on node.js 22.12 and later ([#6](https://github.com/SpringTree/pg-tables-to-zod/issues/6)) ([6e1fc1e](https://github.com/SpringTree/pg-tables-to-zod/commit/6e1fc1e2413cae93dff7420b4685cbfc3a08b264))
+
 ## [2.0.0](https://github.com/SpringTree/pg-tables-to-zod/compare/v1.0.24...v2.0.0) (2026-11-24)
 
 
